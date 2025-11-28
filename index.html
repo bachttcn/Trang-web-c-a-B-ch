@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Cá Nhân Của Tôi</title>
+    <style>
+        /* Phần này là trang trí giao diện (CSS) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Màu nền gradient tím xanh */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 350px; /* Độ rộng tối đa của khung */
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%; /* Bo tròn ảnh */
+            object-fit: cover;
+            border: 4px solid #764ba2;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .btn {
+            display: block;
+            background-color: #f3f3f3;
+            color: #333;
+            text-decoration: none;
+            padding: 12px;
+            border-radius: 50px; /* Nút bo tròn */
+            margin-bottom: 15px;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #764ba2; /* Màu khi di chuột vào */
+            color: white;
+            transform: translateY(-2px); /* Hiệu ứng nổi lên nhẹ */
+        }
+
+        /* Nút đặc biệt */
+        .btn-highlight {
+            background-color: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Felix" alt="Avatar" class="avatar">
+        
+        <h1>Xin chào, mình là Toàn Bách!</h1>
+        
+        <p>Web Designer | Content Creator | Yêu công nghệ</p>
+
+        <a href="https://www.facebook.com/tbachtv3000" class="btn btn-highlight" target="_blank">Kết bạn Facebook</a>
+        <a href="https://zalo.me/84945814468" class="btn btn-highlight" target="_blank">Kết bạn Zalo</a>
+        <a href="https://www.tiktok.com/@trinhtoanbach" class="btn" target="_blank">Kênh TikTok</a>
+        <a href="mailto:tbachtv3000@gmail.com" class="btn">Gửi Email cho tôi</a>
+        <a href="#" class="btn">Website dự án</a>
+    </div>
+
+</body>
+</html>
