@@ -32,19 +32,11 @@ body {
   border: 4px solid #764ba2;
   margin-bottom: 20px;
 }
-/* Tiêu đề */
-h1 {
-  font-size: 24px;
-  margin: 0 0 10px;
-  color: #00bfff; /* màu chữ */
-  text-shadow: 0 0 3px #00bfff, 0 0 6px #00bfff; /* glow vừa phải */
-}
+h1 { font-size: 24px; margin: 0 0 10px; }
 p { color: #666; margin-bottom: 30px; font-size: 14px; }
-
-/* Nút liên hệ đồng bộ */
 .btn {
   display: block;
-  background-color: #ff5722; /* cam đẹp */
+  background-color: #ff5722;
   color: white;
   text-decoration: none;
   padding: 12px;
@@ -54,14 +46,28 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   font-weight: bold;
 }
 .btn:hover { background-color: #ff784e; }
-
-/* Nút Tool Google One riêng */
 #openTool {
-  background-color: #ff9900; /* cam sáng riêng */
-  font-weight: bold;
-  font-size: 16px;
+  padding:15px; font-weight:bold; font-size:16px;
 }
-#openTool:hover { background-color: #ffb84d; }
+#toolPopup {
+  display:none;
+  position:fixed;
+  top:50px; left:50%;
+  transform:translateX(-50%);
+  width:90%; max-width:1000px; height:80%;
+  background:#0d0d0d; border-radius:10px; box-shadow:0 0 20px #000;
+  z-index:9999; flex-direction:column; overflow:hidden; display:flex;
+}
+#popupHeader {
+  background:#222; color:#0f0; padding:10px;
+  cursor:move; display:flex; justify-content:space-between; align-items:center;
+}
+#popupHeader button {
+  margin-left:5px; background:#555; color:white;
+  border:none; border-radius:5px; padding:3px 6px; cursor:pointer;
+}
+#popupHeader #closeTool { background:#ff4444; }
+#toolFrame { flex:1; border:none; width:100%; border-radius:10px; }
 </style>
 </head>
 <body>
