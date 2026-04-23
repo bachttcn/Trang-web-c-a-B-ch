@@ -65,6 +65,48 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   background-color: #ff5722;
 }
 
+/* Popup Tool */
+#toolPopup {
+  display: none;
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px;
+  height: 80%;
+  background: #0d0d0d;
+  border-radius: 10px;
+  box-shadow: 0 0 30px #000;
+  z-index: 9999;
+  flex-direction: column;
+  overflow: hidden;
+  display: flex;
+}
+#popupHeader {
+  background: #222;
+  color: #0f0;
+  padding: 10px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#popupHeader button {
+  margin-left: 5px;
+  background: #555;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+#toolFrame {
+  flex: 1;
+  border: none;
+  width: 100%;
+}
+
 </style>
 </head>
 <body>
