@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>BACH TOKEN TOOL</title>
+
+<style>
+body { background:#0d0d0d; color:#0f0; font-family:Arial; padding:20px; }
+textarea { width:100%; background:#1a1a1a; color:#0f0; padding:10px; }
+button { margin:5px; padding:8px 14px; border:none; cursor:pointer; }
+.box { border:1px solid #333; padding:10px; margin-top:10px; border-radius:6px; }
+.running { border:2px solid #00ff00; }
+.done { opacity:0.6; }
+</style>
+
+</head>
+
+<body>
+
+<h2>🔥 BACH TOKEN TOOL</h2>
+
+<textarea id="input" rows="6" placeholder="Dán token nguồn"></textarea>
+
+<br>
+<label>Delay min: </label>
+<input type="number" id="dmin" value="1200">
+
+<label>Delay max: </label>
+<input type="number" id="dmax" value="2500">
+
+<label>Max chạy: </label>
+<input type="number" id="limit" value="3">
+
+<br>
+<button onclick="process()">Xử lý</button>
+<button onclick="runStealth()">Run Stealth</button>
+<button onclick="stopRun()">STOP</button>
+<button onclick="clearAll()">Xóa</button>
+
+<div id="out"></div>
+
+<script>
+
+let running = false;
+
+// ===== TOKEN FULL KHÔNG CẮT =====
+const TOKENS = {
+
+"12m": "google.android.apps.subscriptions.red%3Ag1.2tb.ai.12months_eft.3%22%2C21%5D%2Cnull%2Cnull%2Cnull%2C1%2C%5B%22ASivciaXb4TgcwIgqy%2BwbtHXYErDG6sNNHck8L0AAknyM1RUpDkpk10P8LiwJ8ZJHLHOSbrYYjoVijIZOL4FaPt8lSZUF5Je6OlR%22%5D%5D%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2Cnull%2C%5Bnull%2C%22AXYi0qwwRgIhAIUBrzA4w3jbTfWA8uBOtW0mneC4TGM1MG36rcSPTHcAAiEA8R38e6cGHqva5j%2BkzJOCY5U6QwO%2F626nBHf76Mdomvk%3D%22%2C%5B1769410607%2C873451000%5D%2C%22f291a043-4af9-40df-88bd-6b6f17fd5c64%22%5D%5D&usegapi=1&id=I0_1769410612901&_gfid=I0_1769410612901&parent=https%3A%2F%2Fone.google.com",
+
+"4m": "google.android.apps.subscriptions.red%3Ag1.2tb.ai.4months_eft%22%2C21%5D%2Cnull%2Cnull%2Cnull%2C1%2C%5B%22ASivcia3kkQHb%2FnIV42r8Nnf7fdXHcUCtsOuohpC2EnogFpcg5R6K7zluONcxJiPoBkoOzOP62BQL6uyHrsSlHUi%2BRuZN6Gf8wdyF0Vjj0g%3D%22%5D%5D%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2Cnull%2C%5Bnull%2C%22AXYi0qwwRgIhAPzocCAKFtoUWZZE5rVokCqFQpa7EOA3%2BBrihKs6JNqrAiEAghe6Acc8%2FJu52nHrJ2%2BK0yfq7y0X%2BIHKo8%2BgKHOARmo%3D%22%2C%5B1769410196%2C809292000%5D%2C%22a35d2f5c-9360-4e4e-9b07-387a9634954c%22%5D%5D&usegapi=1&id=I1_1769410219726&_gfid=I1_1769410219726&parent=https%3A%2F%2Fone.google.com",
+
+"1m": "google.android.apps.subscriptions.red%3Ag1.2tb.ai.1month_eft%22%2C21%5D%2Cnull%2Cnull%2Cnull%2C1%2C%5B%22ASivcibg%2BL4lopIKmxGRVoY0hny8tPU%2F2boCCkwfLZ8PD8NQFNphiY0ah49oSttaHCLY6zQoVCRQhp9aNy7WCX8%2FpC%2FOb%2BEnbyma5jpdcTM%3D%22%5D%5D%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2Cnull%2C%5Bnull%2C%22AXYi0qwwRQIhAOStagOxzrKPlpFm%2BCGux5Air5qdXeyMk2XFwnI6oz6TAiBL4cLYKTnKZz1B%2BQ3hMVnhomftRQSSO4yi2NipdU%2BISg%3D%3D%22%2C%5B1769410127%2C71712000%5D%2C%2222cac307-b794-4d57-b0ce-1b14fa43bd69%22%5D%5D&usegapi=1&id=I0_1769410135724&_gfid=I0_1769410135724&parent=https%3A%2F%2Fone.google.com",
+
+"Ultra": "google.android.apps.subscriptions.red%3Ag1.ai.pro.3months_ip_50p%22%2C21%5D%2Cnull%2Cnull%2Cnull%2C1%2C%5B%22AdummIv6rSkTRUh1Gbm9TvZk4lZvKSGdibiw2GWYphMuVPewFTRXBADM9H8RXAsJz07U9ycuCyllzdPwVm%2B8qs4Fvbb081FlqLGjUN8x0Q%3D%3D%22%5D%5D%5D%5D%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2Cnull%2C1%2Cnull%2Cnull%2C%5Bnull%2C%22AXYi0qwwRQIgCC%2FBdaimjvwUixBOiZKBwBpulODgncZR75%2FhL%2BVeyM0CIQCC68%2BrhJJY5aw%2BMS%2F3%2FH0gYbg8YWIMZKKEisQJM00kKg%3D%3D%22%2C%5B1776750495%2C622106000%5D%2C%225578bc6c-e5a8-4f6e-8231-3ce9ca0527db%22%5D%5D&usegapi=1&id=I1_1776750496958&_gfid=I1_1776750496958&parent=https%3A%2F%2Fone.google.com"
+};
+
+// ===== PROCESS =====
+function process(){
+    let base = document.getElementById("input").value;
+
+    base = base.replace("C6%","C5%");
+    let pos = base.indexOf("3Acom.");
+
+    if(pos === -1){
+        alert("Token sai");
+        return;
+    }
+
+    base = base.substring(0,pos+6);
+
+    let html = "";
+
+    for(let k in TOKENS){
+        let full = base + TOKENS[k];
+
+        html += `
+        <div class="box" id="box_${k}">
+            <b>${k}</b>
+            <textarea id="t_${k}">${full}</textarea>
+            <br>
+            <button onclick="runOne('${k}')">Run ${k}</button>
+        </div>`;
+    }
+
+    document.getElementById("out").innerHTML = html;
+}
+
+// ===== RUN 1 =====
+function runOne(k){
+    let el = document.getElementById("t_"+k);
+    if(!el) return;
+
+    window.open(el.value,"_blank");
+}
+
+// ===== STEALTH =====
+async function runStealth(){
+    running = true;
+
+    let min = parseInt(document.getElementById("dmin").value);
+    let max = parseInt(document.getElementById("dmax").value);
+    let limit = parseInt(document.getElementById("limit").value);
+
+    let count = 0;
+
+    for(let k in TOKENS){
+        if(!running) break;
+
+        let el = document.getElementById("t_"+k);
+        if(!el) continue;
+
+        window.open(el.value,"_blank");
+        count++;
+
+        if(count >= limit) break;
+
+        await sleep(Math.random()*(max-min)+min);
+    }
+}
+
+function stopRun(){ running = false; }
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+function clearAll(){
+    document.getElementById("input").value="";
+    document.getElementById("out").innerHTML="";
+}
+
+</script>
+
+</body>
+</html>
