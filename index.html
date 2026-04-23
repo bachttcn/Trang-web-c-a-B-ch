@@ -32,17 +32,8 @@ body {
   border: 4px solid #764ba2;
   margin-bottom: 20px;
 }
-h1 {
-  font-size: 24px;
-  margin: 0 0 10px;
-  color: #00ffff; /* Neon blue */
-  text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 20px #00ffff;
-}
-p {
-  color: #666;
-  margin-bottom: 30px;
-  font-size: 14px;
-}
+h1 { font-size: 24px; margin: 0 0 10px; }
+p { color: #666; margin-bottom: 30px; font-size: 14px; }
 .btn {
   display: block;
   background-color: #f3f3f3;
@@ -63,6 +54,53 @@ p {
   background-color: #333;
   color: white;
 }
+#openTool {
+  display: block;
+  padding: 15px;
+  background: #ff5722;
+  color: white;
+  border-radius: 25px;
+  text-align: center;
+  margin: 10px 0;
+  border: none;
+  cursor: pointer;
+}
+#toolPopup {
+  display: none;
+  position: fixed;
+  top: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  max-width: 1000px;
+  height: 80%;
+  background: #0d0d0d;
+  border-radius: 10px;
+  box-shadow: 0 0 30px #000;
+  z-index: 9999;
+  flex-direction: column;
+  overflow: hidden;
+  display: flex;
+}
+#popupHeader {
+  background:#222; color:#0f0;
+  padding:10px;
+  cursor:move;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+#popupHeader button {
+  margin-left:5px;
+  background:#555;
+  color:white;
+  border:none;
+  border-radius:5px;
+  padding:3px 6px;
+  cursor:pointer;
+}
+#popupHeader #closeTool { background:#ff4444; }
+#toolFrame { flex:1; border:none; width:100%; }
 </style>
 </head>
 <body>
@@ -75,15 +113,82 @@ p {
   
   <p>Web Designer | Content Creator | Yêu công nghệ</p>
 
-  <!-- Nút liên hệ -->
   <a href="https://www.facebook.com/tbachtv3000" class="btn btn-highlight" target="_blank">Kết bạn Facebook</a>
   <a href="https://zalo.me/84945814468" class="btn btn-highlight" target="_blank">Kết bạn Zalo</a>
   <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-highlight" target="_blank">Kênh TikTok</a>
   <a href="mailto:tbachtv3000@gmail.com" class="btn btn-highlight" target="_blank">Gửi Email cho tôi</a>
   <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-highlight" target="_blank">Website Cơ Quan</a>
 
+  <!-- Nút mở Tool Google One -->
+  <button id="openTool">🔥 Mở Tool Google One</button>
+
+  <!-- Popup Tool -->
+  <div id="toolPopup">
+    <div id="popupHeader">
+      <span>🔥 Tool Google One</span>
+      <div>
+        <button id="minimizeTool">–</button>
+        <button id="closeTool">×</button>
+      </div>
+    </div>
+    <iframe id="toolFrame" src="/tool.html"></iframe>
+  </div>
+
   <p>STK MBBank: 0945814468; STK AgriBank: 0945814468 | TRỊNH TOÀN BÁCH | Email: tbachtv3000@gmail.com</p>
 </div>
+
+<script>
+const openBtn = document.getElementById("openTool");
+const popup = document.getElementById("toolPopup");
+const closeBtn = document.getElementById("closeTool");
+const minimizeBtn = document.getElementById("minimizeTool");
+const frame = document.getElementById("toolFrame");
+const header = document.getElementById("popupHeader");
+
+// Chỉ mở khi click
+openBtn.onclick = () => {
+  popup.style.display = "flex";
+  frame.style.display = "block";
+};
+
+// Đóng popup
+closeBtn.onclick = () => popup.style.display = "none";
+
+// Minimize/Maximize
+let minimized = false;
+minimizeBtn.onclick = () => {
+  minimized = !minimized;
+  if(minimized){
+    popup.style.height = "40px";
+    frame.style.display = "none";
+  } else {
+    popup.style.height = "80%";
+    frame.style.display = "block";
+  }
+};
+
+// Drag popup
+let isDragging = false;
+let offsetX, offsetY;
+header.onmousedown = (e) => {
+  isDragging = true;
+  offsetX = e.clientX - popup.offsetLeft;
+  offsetY = e.clientY - popup.offsetTop;
+  document.body.style.userSelect = "none";
+};
+document.onmouseup = () => { isDragging = false; document.body.style.userSelect = "auto"; };
+document.onmousemove = (e) => {
+  if(isDragging){
+    let left = e.clientX - offsetX;
+    let top = e.clientY - offsetY;
+    left = Math.max(0, Math.min(left, window.innerWidth - popup.offsetWidth));
+    top = Math.max(0, Math.min(top, window.innerHeight - popup.offsetHeight));
+    popup.style.left = left + "px";
+    popup.style.top = top + "px";
+    popup.style.transform = "none";
+  }
+};
+</script>
 
 </body>
 </html>
