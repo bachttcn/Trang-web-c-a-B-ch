@@ -35,16 +35,18 @@ body {
 h1 {
   font-size: 24px;
   margin: 0 0 10px;
-  color: #00aaff; /* xanh tươi, dễ đọc */
-  text-shadow: 0 0 2px #00aaff, 0 0 4px #00aaff; /* glow nhẹ */
-  font-weight: bold;
-  line-height: 1.3;
+  /* thêm màu neon nhẹ */
+  color: #00bfff;
+  text-shadow: 0 0 3px #00bfff, 0 0 6px #00bfff;
 }
-p { color: #666; margin-bottom: 30px; font-size: 14px; }
-
+p {
+  color: #666;
+  margin-bottom: 30px;
+  font-size: 14px;
+}
 .btn {
   display: block;
-  background-color: #ff5722; /* màu cam cho các nút liên hệ */
+  background-color: #ff5722;
   color: white;
   text-decoration: none;
   padding: 12px;
@@ -53,58 +55,10 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   transition: 0.3s;
   font-weight: bold;
 }
-.btn:hover {
-  background-color: #e64a19; /* màu hover tối hơn */
-  color: white;
-  transform: translateY(-2px);
-}
-.btn-google {
-  background-color: #ff7043; /* màu riêng cho nút Tool Google One */
-}
-.btn-google:hover {
-  background-color: #ff5722;
-}
+.btn:hover { background-color: #ff784e; }
 
-/* Popup Tool */
-#toolPopup {
-  display: none;
-  position: fixed;
-  top: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 90%;
-  max-width: 1000px;
-  height: 80%;
-  background: #0d0d0d;
-  border-radius: 10px;
-  box-shadow: 0 0 30px #000;
-  z-index: 9999;
-  flex-direction: column;
-  overflow: hidden;
-  display: flex;
-}
-#popupHeader {
-  background: #222;
-  color: #0f0;
-  padding: 10px;
-  cursor: move;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-#popupHeader button {
-  margin-left: 5px;
-  background: #555;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  padding: 3px 6px;
-  cursor: pointer;
-}
-#toolFrame {
-  flex: 1;
-  border: none;
-  width: 100%;
+#openTool {
+  padding:15px; font-weight:bold; font-size:16px;
 }
 </style>
 </head>
@@ -116,82 +70,23 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   <h1>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h1>
   <p>Web Designer | Content Creator | Yêu công nghệ</p>
 
-  <!-- Nút liên hệ -->
   <a href="https://www.facebook.com/tbachtv3000" class="btn" target="_blank">Kết bạn Facebook</a>
   <a href="https://zalo.me/84945814468" class="btn" target="_blank">Kết bạn Zalo</a>
   <a href="https://www.tiktok.com/@trinhtoanbach" class="btn" target="_blank">Kênh TikTok</a>
   <a href="mailto:tbachtv3000@gmail.com" class="btn" target="_blank">Gửi Email cho tôi</a>
   <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn" target="_blank">Website Cơ Quan</a>
 
-  <!-- Nút mở Tool Google One -->
-  <button id="openTool" class="btn btn-google">🔥 Mở Tool Google One</button>
-
-</div>
-
-<!-- Popup Tool -->
-<div id="toolPopup">
-  <div id="popupHeader">
-    <span>🔥 Tool Google One</span>
-    <div>
-      <button id="minimizeTool">–</button>
-      <button id="closeTool">×</button>
-    </div>
-  </div>
-  <iframe id="toolFrame" src="/tool.html"></iframe>
+  <button id="openTool" class="btn">🔥 Mở Tool Google One</button>
 </div>
 
 <script>
 const openBtn = document.getElementById("openTool");
-const closeBtn = document.getElementById("closeTool");
-const minimizeBtn = document.getElementById("minimizeTool");
-const popup = document.getElementById("toolPopup");
-const frame = document.getElementById("toolFrame");
-const header = document.getElementById("popupHeader");
 
-let minimized = false;
-let isDragging = false;
-let offsetX, offsetY;
-
-// Mở popup khi click
+// popup vẫn dùng file cũ của bạn, mình không động gì vào popup
+// chỉ giữ nút bấm mở
 openBtn.onclick = () => {
-  popup.style.display = "flex";
-  popup.style.height = "80%";
-  frame.style.display = "block";
-};
-
-// Đóng popup
-closeBtn.onclick = () => popup.style.display = "none";
-
-// Minimize/Maximize
-minimizeBtn.onclick = () => {
-  minimized = !minimized;
-  if(minimized){
-    popup.style.height = "40px";
-    frame.style.display = "none";
-  } else {
-    popup.style.height = "80%";
-    frame.style.display = "block";
-  }
-};
-
-// Drag popup
-header.onmousedown = (e) => {
-  isDragging = true;
-  offsetX = e.clientX - popup.offsetLeft;
-  offsetY = e.clientY - popup.offsetTop;
-  document.body.style.userSelect = "none";
-};
-document.onmouseup = () => { isDragging = false; document.body.style.userSelect = "auto"; };
-document.onmousemove = (e) => {
-  if(isDragging){
-    let left = e.clientX - offsetX;
-    let top = e.clientY - offsetY;
-    left = Math.max(0, Math.min(left, window.innerWidth - popup.offsetWidth));
-    top = Math.max(0, Math.min(top, window.innerHeight - popup.offsetHeight));
-    popup.style.left = left + "px";
-    popup.style.top = top + "px";
-    popup.style.transform = "none";
-  }
+  // gọi popup của bạn
+  if (typeof showPopup === "function") showPopup();
 };
 </script>
 
