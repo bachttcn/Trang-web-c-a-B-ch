@@ -359,9 +359,19 @@
 </div>
 
 <script>
-    const apiKey = ""; // API key sẽ được hệ thống tự động cung cấp khi thầy chạy Preview
+    /**
+     * LƯU Ý CHO THẦY BÁCH:
+     * Để chạy trên host riêng (Vercel, GitHub Pages...), thầy cần điền API Key vào đây.
+     * Cách lấy: Truy cập https://aistudio.google.com/app/apikey (Miễn phí)
+     */
+    const apiKey = "AIzaSyCT65-wv-MP-Pl_H6UOYB2zCNgO8pqtk-E"; 
 
     async function callGemini(prompt) {
+        // Kiểm tra xem mã khóa có tồn tại không
+        if (!apiKey) {
+            return "⚠️ Thầy chưa cấu hình API Key trong mã nguồn. \n\nLưu ý: Nếu thầy đang chạy trên Vercel hoặc host riêng, thầy cần điền API Key vào biến 'apiKey' ở dòng 286 của tệp index.html để AI có thể hoạt động.";
+        }
+
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         
         const payload = {
@@ -386,14 +396,8 @@
                     throw new Error(data.error?.message || `Lỗi hệ thống (${response.status})`);
                 }
 
-                // Trích xuất văn bản từ phản hồi của Gemini
                 const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                
-                if (!resultText) {
-                    return "AI không thể đưa ra phản hồi lúc này do chính sách an toàn hoặc thiếu dữ liệu. Thầy vui lòng thử hỏi cách khác ạ.";
-                }
-
-                return resultText;
+                return resultText || "AI không thể đưa ra phản hồi lúc này.";
             } catch (err) {
                 if (i === 4) throw err;
                 await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
@@ -437,7 +441,7 @@
             const result = await callGemini(prompt);
             aiResult.innerText = result;
         } catch (err) {
-            aiResult.innerText = `⚠️ Lỗi kết nối: ${err.message}. \n\nLưu ý: Nếu thầy đang chạy code này trên máy tính cá nhân hoặc host riêng, thầy cần điền API Key vào biến 'apiKey' trong mã nguồn mới chạy được ạ.`;
+            aiResult.innerText = `❌ Lỗi kết nối: ${err.message}. \n\nVui lòng kiểm tra lại cấu hình API Key trong mã nguồn.`;
         } finally {
             aiLoading.style.display = "none";
             generateBtn.disabled = false;
