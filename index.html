@@ -32,22 +32,12 @@ body {
   border: 4px solid #764ba2;
   margin-bottom: 20px;
 }
-h1 {
-  font-size: 24px;
-  margin: 0 0 10px;
-  /* thêm màu neon nhẹ */
-  color: #00bfff;
-  text-shadow: 0 0 3px #00bfff, 0 0 6px #00bfff;
-}
-p {
-  color: #666;
-  margin-bottom: 30px;
-  font-size: 14px;
-}
+h1 { font-size: 24px; margin: 0 0 10px; }
+p { color: #666; margin-bottom: 30px; font-size: 14px; }
 .btn {
   display: block;
-  background-color: #ff5722;
-  color: white;
+  background-color: #f3f3f3;
+  color: #333;
   text-decoration: none;
   padding: 12px;
   border-radius: 50px;
@@ -55,10 +45,14 @@ p {
   transition: 0.3s;
   font-weight: bold;
 }
-.btn:hover { background-color: #ff784e; }
-
-#openTool {
-  padding:15px; font-weight:bold; font-size:16px;
+.btn:hover {
+  background-color: #764ba2;
+  color: white;
+  transform: translateY(-2px);
+}
+.btn-highlight {
+  background-color: #333;
+  color: white;
 }
 </style>
 </head>
@@ -70,25 +64,55 @@ p {
   <h1>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h1>
   <p>Web Designer | Content Creator | Yêu công nghệ</p>
 
-  <a href="https://www.facebook.com/tbachtv3000" class="btn" target="_blank">Kết bạn Facebook</a>
-  <a href="https://zalo.me/84945814468" class="btn" target="_blank">Kết bạn Zalo</a>
-  <a href="https://www.tiktok.com/@trinhtoanbach" class="btn" target="_blank">Kênh TikTok</a>
-  <a href="mailto:tbachtv3000@gmail.com" class="btn" target="_blank">Gửi Email cho tôi</a>
-  <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn" target="_blank">Website Cơ Quan</a>
+  <!-- Nút liên hệ -->
+  <a href="https://www.facebook.com/tbachtv3000" class="btn btn-highlight" target="_blank">Kết bạn Facebook</a>
+  <a href="https://zalo.me/84945814468" class="btn btn-highlight" target="_blank">Kết bạn Zalo</a>
+  <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-highlight" target="_blank">Kênh TikTok</a>
+  <a href="mailto:tbachtv3000@gmail.com" class="btn btn-highlight" target="_blank">Gửi Email cho tôi</a>
+  <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-highlight" target="_blank">Website Cơ Quan</a>
+<!-- NÚT MỞ TOOL -->
+<button id="openTool" 
+        style="display:block; padding:15px; background:#ff5722; color:white; border-radius:25px; text-align:center; margin:10px 0; border:none; cursor:pointer;">
+  🔥 Mở Tool Google One
+</button>
 
-  <button id="openTool" class="btn">🔥 Mở Tool Google One</button>
+<!-- POPUP MODAL -->
+<div id="toolPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+  background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+  
+  <div style="position:relative; width:90%; max-width:1000px; height:80%; background:#0d0d0d; border-radius:10px; box-shadow:0 0 20px #000; display:flex; flex-direction:column;">
+    
+    <!-- NÚT ĐÓNG -->
+    <button id="closeTool" style="position:absolute; top:10px; right:10px; background:#ff4444; color:white; border:none; border-radius:50%; width:35px; height:35px; cursor:pointer; font-size:18px;">×</button>
+    
+    <!-- IFRAME TOOL -->
+    <iframe src="/tool.html" style="flex:1; border:none; border-radius:10px;"></iframe>
+  </div>
 </div>
 
 <script>
-const openBtn = document.getElementById("openTool");
+  const openBtn = document.getElementById("openTool");
+  const closeBtn = document.getElementById("closeTool");
+  const popup = document.getElementById("toolPopup");
 
-// popup vẫn dùng file cũ của bạn, mình không động gì vào popup
-// chỉ giữ nút bấm mở
-openBtn.onclick = () => {
-  // gọi popup của bạn
-  if (typeof showPopup === "function") showPopup();
-};
-</script>
+  // mở popup
+  openBtn.onclick = () => {
+    popup.style.display = "flex";
+  };
+
+  // đóng popup
+  closeBtn.onclick = () => {
+    popup.style.display = "none";
+  };
+
+  // click ra ngoài popup cũng đóng
+  popup.onclick = (e) => {
+    if(e.target === popup) popup.style.display = "none";
+  };
+</script>    
+  
+  <p>STK MBBank: 0945814468; STK AgriBank: 0945814468 | TRỊNH TOÀN BÁCH | Email: tbachtv3000@gmail.com</p>
+</div>
 
 </body>
 </html>
