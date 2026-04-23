@@ -360,16 +360,13 @@
 
 <script>
     /**
-     * LƯU Ý CHO THẦY BÁCH:
-     * Để chạy trên host riêng (Vercel, GitHub Pages...), thầy cần điền API Key vào đây.
-     * Cách lấy: Truy cập https://aistudio.google.com/app/apikey (Miễn phí)
+     * API KEY CỦA THẦY ĐÃ ĐƯỢC DÁN VÀO ĐÂY:
      */
-    const apiKey = "AIzaSyCT65-wv-MP-Pl_H6UOYB2zCNgO8pqtk-E"; 
+    const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
 
     async function callGemini(prompt) {
-        // Kiểm tra xem mã khóa có tồn tại không
         if (!apiKey) {
-            return "⚠️ Thầy chưa cấu hình API Key trong mã nguồn. \n\nLưu ý: Nếu thầy đang chạy trên Vercel hoặc host riêng, thầy cần điền API Key vào biến 'apiKey' ở dòng 286 của tệp index.html để AI có thể hoạt động.";
+            return "⚠️ Thầy chưa dán API Key vào mã nguồn.";
         }
 
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
