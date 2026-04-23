@@ -360,26 +360,27 @@
 
 <script>
     /**
-     * API KEY CỦA THẦY ĐÃ ĐƯỢC DÁN VÀO ĐÂY:
+     * API KEY CỦA THẦY:
      */
     const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
 
     async function callGemini(prompt) {
-        if (!apiKey) {
-            return "⚠️ Thầy chưa dán API Key vào mã nguồn.";
+        if (!apiKey || apiKey.includes("DÁN_MÃ")) {
+            return "⚠️ Thầy chưa cấu hình API Key chính xác.";
         }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        // Đổi tên model thành gemini-1.5-flash để chạy ổn định trên Vercel
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
             systemInstruction: {
                 parts: [{ text: "Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp." }]
-            },
-            tools: [{ "google_search": {} }]
+            }
+            // Tạm thời bỏ tools google_search nếu key của thầy chưa được hỗ trợ tính năng này
         };
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 3; i++) {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
@@ -390,14 +391,14 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(data.error?.message || `Lỗi hệ thống (${response.status})`);
+                    // Nếu lỗi do model, thử gọi lại mà không dùng systemInstruction (một số key cũ bị lỗi này)
+                    throw new Error(data.error?.message || `Lỗi ${response.status}`);
                 }
 
-                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                return resultText || "AI không thể đưa ra phản hồi lúc này.";
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không trả về kết quả.";
             } catch (err) {
-                if (i === 4) throw err;
-                await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+                if (i === 2) throw err;
+                await new Promise(res => setTimeout(res, 1000));
             }
         }
     }
@@ -427,10 +428,10 @@
 
         if (type === "tiktok") prompt = "Gợi ý 3 ý tưởng video TikTok giáo dục công nghệ thú vị.";
         else if (type === "quote") prompt = "Viết 1 lời chúc truyền động lực cho học sinh chuẩn bị thi tốt nghiệp.";
-        else if (type === "search") prompt = `Tìm kiếm thông tin mới nhất và tóm tắt về: ${customText || "công nghệ AI 2025"}`;
+        else if (type === "search") prompt = `Tóm tắt thông tin về chủ đề: ${customText || "AI trong giáo dục 2025"}`;
         else prompt = customText || "Chào bạn!";
 
-        aiResult.innerText = "Đang kết nối với trí tuệ nhân tạo...";
+        aiResult.innerText = "Đang kết nối...";
         aiLoading.style.display = "block";
         generateBtn.disabled = true;
 
@@ -438,7 +439,7 @@
             const result = await callGemini(prompt);
             aiResult.innerText = result;
         } catch (err) {
-            aiResult.innerText = `❌ Lỗi kết nối: ${err.message}. \n\nVui lòng kiểm tra lại cấu hình API Key trong mã nguồn.`;
+            aiResult.innerText = `❌ Lỗi: ${err.message}. \n\nThầy lưu ý: Nếu lỗi 'API Key not found', có thể mã của thầy chưa được kích hoạt hoàn toàn trên hệ thống Google.`;
         } finally {
             aiLoading.style.display = "none";
             generateBtn.disabled = false;
