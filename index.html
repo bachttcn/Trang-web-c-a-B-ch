@@ -36,8 +36,8 @@ h1 { font-size: 24px; margin: 0 0 10px; }
 p { color: #666; margin-bottom: 30px; font-size: 14px; }
 .btn {
   display: block;
-  background-color: #ff5722;
-  color: white;
+  background-color: #f3f3f3;
+  color: #333;
   text-decoration: none;
   padding: 12px;
   border-radius: 50px;
@@ -45,26 +45,46 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   transition: 0.3s;
   font-weight: bold;
 }
-.btn:hover { background-color: #ff784e; }
-#openTool {
-  padding:15px; font-weight:bold; font-size:16px;
+.btn:hover {
+  background-color: #764ba2;
+  color: white;
+  transform: translateY(-2px);
 }
+.btn-highlight {
+  background-color: #333;
+  color: white;
+}
+#openTool {
+  display:block; padding:15px; background:#ff5722; color:white;
+  border-radius:25px; text-align:center; margin:10px 0;
+  border:none; cursor:pointer;
+}
+
+/* Popup nâng cấp */
 #toolPopup {
   display:none;
   position:fixed;
   top:50px; left:50%;
   transform:translateX(-50%);
   width:90%; max-width:1000px; height:80%;
-  background:#0d0d0d; border-radius:10px; box-shadow:0 0 20px #000;
-  z-index:9999; flex-direction:column; overflow:hidden; display:flex;
+  background:#0d0d0d;
+  border-radius:10px;
+  box-shadow:0 0 20px #000;
+  z-index:9999;
+  flex-direction:column;
+  overflow:hidden;
+  display:flex;
 }
 #popupHeader {
   background:#222; color:#0f0; padding:10px;
-  cursor:move; display:flex; justify-content:space-between; align-items:center;
+  cursor:move;
+  display:flex; justify-content:space-between;
+  align-items:center;
 }
 #popupHeader button {
   margin-left:5px; background:#555; color:white;
-  border:none; border-radius:5px; padding:3px 6px; cursor:pointer;
+  border:none; border-radius:5px; padding:3px 6px;
+  cursor:pointer;
 }
 #popupHeader #closeTool { background:#ff4444; }
 #toolFrame { flex:1; border:none; width:100%; border-radius:10px; }
@@ -78,17 +98,16 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   <h1>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h1>
   <p>Web Designer | Content Creator | Yêu công nghệ</p>
 
-  <!-- Nút liên hệ -->
-  <a href="https://www.facebook.com/tbachtv3000" class="btn" target="_blank">Kết bạn Facebook</a>
-  <a href="https://zalo.me/84945814468" class="btn" target="_blank">Kết bạn Zalo</a>
-  <a href="https://www.tiktok.com/@trinhtoanbach" class="btn" target="_blank">Kênh TikTok</a>
-  <a href="mailto:tbachtv3000@gmail.com" class="btn" target="_blank">Gửi Email cho tôi</a>
-  <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn" target="_blank">Website Cơ Quan</a>
+  <a href="https://www.facebook.com/tbachtv3000" class="btn btn-highlight" target="_blank">Kết bạn Facebook</a>
+  <a href="https://zalo.me/84945814468" class="btn btn-highlight" target="_blank">Kết bạn Zalo</a>
+  <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-highlight" target="_blank">Kênh TikTok</a>
+  <a href="mailto:tbachtv3000@gmail.com" class="btn btn-highlight" target="_blank">Gửi Email cho tôi</a>
+  <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-highlight" target="_blank">Website Cơ Quan</a>
 
-  <!-- Nút mở Tool -->
-  <button id="openTool" class="btn">🔥 Mở Tool Google One</button>
+  <!-- Nút mở tool -->
+  <button id="openTool">🔥 Mở Tool Google One</button>
 
-  <!-- Popup Tool -->
+  <!-- Popup nâng cấp -->
   <div id="toolPopup">
     <div id="popupHeader">
       <span>🔥 Tool Google One</span>
@@ -111,24 +130,47 @@ const minimizeBtn = document.getElementById("minimizeTool");
 const frame = document.getElementById("toolFrame");
 const header = document.getElementById("popupHeader");
 
-// mở popup khi click
-openBtn.onclick = () => { popup.style.display = "flex"; frame.style.display="block"; };
-// đóng popup
+// Mở popup khi click
+openBtn.onclick = () => {
+  popup.style.display = "flex";
+  frame.style.display = "block";
+};
+
+// Đóng popup
 closeBtn.onclick = () => popup.style.display = "none";
 
-// minimize/maximize
+// Minimize / Maximize
 let minimized = false;
 minimizeBtn.onclick = () => {
   minimized = !minimized;
-  if(minimized){ popup.style.height="40px"; frame.style.display="none"; }
-  else{ popup.style.height="80%"; frame.style.display="block"; }
+  if(minimized){
+    popup.style.height = "40px";
+    frame.style.display = "none";
+  } else {
+    popup.style.height = "80%";
+    frame.style.display = "block";
+  }
 };
 
-// drag popup
-let isDragging=false, offsetX, offsetY;
-header.onmousedown = (e)=>{ isDragging=true; offsetX=e.clientX-popup.offsetLeft; offsetY=e.clientY-popup.offsetTop; document.body.style.userSelect="none"; };
-document.onmouseup = ()=>{ isDragging=false; document.body.style.userSelect="auto"; };
-document.onmousemove = (e)=>{ if(!isDragging) return; let left=e.clientX-offsetX; let top=e.clientY-offsetY; left=Math.max(0, Math.min(left, window.innerWidth-popup.offsetWidth)); top=Math.max(0, Math.min(top, window.innerHeight-popup.offsetHeight)); popup.style.left=left+"px"; popup.style.top=top+"px"; popup.style.transform="none"; };
+// Drag popup
+let isDragging = false, offsetX, offsetY;
+header.onmousedown = (e) => {
+  isDragging = true;
+  offsetX = e.clientX - popup.offsetLeft;
+  offsetY = e.clientY - popup.offsetTop;
+  document.body.style.userSelect = "none";
+};
+document.onmouseup = () => { isDragging = false; document.body.style.userSelect = "auto"; };
+document.onmousemove = (e) => {
+  if(!isDragging) return;
+  let left = e.clientX - offsetX;
+  let top = e.clientY - offsetY;
+  left = Math.max(0, Math.min(left, window.innerWidth - popup.offsetWidth));
+  top = Math.max(0, Math.min(top, window.innerHeight - popup.offsetHeight));
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+  popup.style.transform = "none";
+};
 </script>
 
 </body>
