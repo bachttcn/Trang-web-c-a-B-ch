@@ -45,40 +45,26 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   transition: 0.3s;
   font-weight: bold;
 }
-.btn:hover {
-  background-color: #ff784e;
-}
+.btn:hover { background-color: #ff784e; }
 #openTool {
-  background:#ff5722; color:white; border:none; border-radius:25px;
-  padding:15px; cursor:pointer; font-weight:bold; font-size:16px;
+  padding:15px; font-weight:bold; font-size:16px;
 }
-#openTool:hover { background:#ff784e; }
-
-/* Popup nâng cấp */
 #toolPopup {
   display:none;
   position:fixed;
   top:50px; left:50%;
   transform:translateX(-50%);
   width:90%; max-width:1000px; height:80%;
-  background:#0d0d0d;
-  border-radius:10px;
-  box-shadow:0 0 20px #000;
-  z-index:9999;
-  flex-direction:column;
-  overflow:hidden;
-  display:flex;
+  background:#0d0d0d; border-radius:10px; box-shadow:0 0 20px #000;
+  z-index:9999; flex-direction:column; overflow:hidden; display:flex;
 }
 #popupHeader {
   background:#222; color:#0f0; padding:10px;
-  cursor:move;
-  display:flex; justify-content:space-between;
-  align-items:center;
+  cursor:move; display:flex; justify-content:space-between; align-items:center;
 }
 #popupHeader button {
   margin-left:5px; background:#555; color:white;
-  border:none; border-radius:5px; padding:3px 6px;
-  cursor:pointer;
+  border:none; border-radius:5px; padding:3px 6px; cursor:pointer;
 }
 #popupHeader #closeTool { background:#ff4444; }
 #toolFrame { flex:1; border:none; width:100%; border-radius:10px; }
@@ -100,9 +86,9 @@ p { color: #666; margin-bottom: 30px; font-size: 14px; }
   <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn" target="_blank">Website Cơ Quan</a>
 
   <!-- Nút mở Tool -->
-  <button id="openTool">🔥 Mở Tool Google One</button>
+  <button id="openTool" class="btn">🔥 Mở Tool Google One</button>
 
-  <!-- Popup nâng cấp -->
+  <!-- Popup Tool -->
   <div id="toolPopup">
     <div id="popupHeader">
       <span>🔥 Tool Google One</span>
@@ -125,47 +111,24 @@ const minimizeBtn = document.getElementById("minimizeTool");
 const frame = document.getElementById("toolFrame");
 const header = document.getElementById("popupHeader");
 
-// Mở popup khi click
-openBtn.onclick = () => {
-  popup.style.display = "flex";
-  frame.style.display = "block";
-};
-
-// Đóng popup
+// mở popup khi click
+openBtn.onclick = () => { popup.style.display = "flex"; frame.style.display="block"; };
+// đóng popup
 closeBtn.onclick = () => popup.style.display = "none";
 
-// Minimize / Maximize
+// minimize/maximize
 let minimized = false;
 minimizeBtn.onclick = () => {
   minimized = !minimized;
-  if(minimized){
-    popup.style.height = "40px";
-    frame.style.display = "none";
-  } else {
-    popup.style.height = "80%";
-    frame.style.display = "block";
-  }
+  if(minimized){ popup.style.height="40px"; frame.style.display="none"; }
+  else{ popup.style.height="80%"; frame.style.display="block"; }
 };
 
-// Drag popup
-let isDragging = false, offsetX, offsetY;
-header.onmousedown = (e) => {
-  isDragging = true;
-  offsetX = e.clientX - popup.offsetLeft;
-  offsetY = e.clientY - popup.offsetTop;
-  document.body.style.userSelect = "none";
-};
-document.onmouseup = () => { isDragging = false; document.body.style.userSelect = "auto"; };
-document.onmousemove = (e) => {
-  if(!isDragging) return;
-  let left = e.clientX - offsetX;
-  let top = e.clientY - offsetY;
-  left = Math.max(0, Math.min(left, window.innerWidth - popup.offsetWidth));
-  top = Math.max(0, Math.min(top, window.innerHeight - popup.offsetHeight));
-  popup.style.left = left + "px";
-  popup.style.top = top + "px";
-  popup.style.transform = "none";
-};
+// drag popup
+let isDragging=false, offsetX, offsetY;
+header.onmousedown = (e)=>{ isDragging=true; offsetX=e.clientX-popup.offsetLeft; offsetY=e.clientY-popup.offsetTop; document.body.style.userSelect="none"; };
+document.onmouseup = ()=>{ isDragging=false; document.body.style.userSelect="auto"; };
+document.onmousemove = (e)=>{ if(!isDragging) return; let left=e.clientX-offsetX; let top=e.clientY-offsetY; left=Math.max(0, Math.min(left, window.innerWidth-popup.offsetWidth)); top=Math.max(0, Math.min(top, window.innerHeight-popup.offsetHeight)); popup.style.left=left+"px"; popup.style.top=top+"px"; popup.style.transform="none"; };
 </script>
 
 </body>
