@@ -361,23 +361,25 @@
 <script>
     /**
      * API KEY CỦA THẦY:
+     * Đảm bảo thầy đã copy chính xác mã và dán vào đây. 
+     * Nếu vẫn lỗi, thầy hãy kiểm tra mục "Credentials" trên Google Cloud Console 
+     * xem có bị hạn chế IP hay tên miền (Vercel) không nhé.
      */
-    const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
+    const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E".trim(); 
 
     async function callGemini(prompt) {
         if (!apiKey || apiKey.includes("DÁN_MÃ")) {
-            return "⚠️ Thầy chưa cấu hình API Key chính xác.";
+            return "⚠️ Thầy chưa cấu hình API Key chính xác trong mã nguồn.";
         }
 
-        // Đổi tên model thành gemini-1.5-flash để chạy ổn định trên Vercel
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // Sử dụng phiên bản v1 ổn định
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
         const payload = {
             contents: [{ parts: [{ text: prompt }] }],
             systemInstruction: {
                 parts: [{ text: "Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp." }]
             }
-            // Tạm thời bỏ tools google_search nếu key của thầy chưa được hỗ trợ tính năng này
         };
 
         for (let i = 0; i < 3; i++) {
@@ -391,11 +393,16 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    // Nếu lỗi do model, thử gọi lại mà không dùng systemInstruction (một số key cũ bị lỗi này)
-                    throw new Error(data.error?.message || `Lỗi ${response.status}`);
+                    // Trích xuất lỗi cụ thể từ Google
+                    const errorMsg = data.error?.message || `Lỗi kết nối (${response.status})`;
+                    if (errorMsg.includes("API key not valid")) {
+                        throw new Error("Mã API không hợp lệ. Thầy vui lòng kiểm tra lại quyền truy cập API trong Google Cloud Console.");
+                    }
+                    throw new Error(errorMsg);
                 }
 
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không trả về kết quả.";
+                const resultText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                return resultText || "AI không trả về kết quả. Thầy thử lại nhé.";
             } catch (err) {
                 if (i === 2) throw err;
                 await new Promise(res => setTimeout(res, 1000));
@@ -426,12 +433,12 @@
         const customText = aiCustomInput.value.trim();
         let prompt = "";
 
-        if (type === "tiktok") prompt = "Gợi ý 3 ý tưởng video TikTok giáo dục công nghệ thú vị.";
-        else if (type === "quote") prompt = "Viết 1 lời chúc truyền động lực cho học sinh chuẩn bị thi tốt nghiệp.";
-        else if (type === "search") prompt = `Tóm tắt thông tin về chủ đề: ${customText || "AI trong giáo dục 2025"}`;
+        if (type === "tiktok") prompt = "Gợi ý 3 ý tưởng video TikTok giáo dục công nghệ thú vị và mới nhất cho năm 2024.";
+        else if (type === "quote") prompt = "Viết 1 lời chúc truyền động lực cho học sinh Trung tâm GDTX chuẩn bị thi tốt nghiệp.";
+        else if (type === "search") prompt = `Tóm tắt kiến thức mới nhất về: ${customText || "AI trong giáo dục"}`;
         else prompt = customText || "Chào bạn!";
 
-        aiResult.innerText = "Đang kết nối...";
+        aiResult.innerText = "Đang kết nối với AI...";
         aiLoading.style.display = "block";
         generateBtn.disabled = true;
 
@@ -439,7 +446,7 @@
             const result = await callGemini(prompt);
             aiResult.innerText = result;
         } catch (err) {
-            aiResult.innerText = `❌ Lỗi: ${err.message}. \n\nThầy lưu ý: Nếu lỗi 'API Key not found', có thể mã của thầy chưa được kích hoạt hoàn toàn trên hệ thống Google.`;
+            aiResult.innerText = `❌ ${err.message}. \n\nThầy lưu ý: Hãy kiểm tra xem dự án Google Cloud của thầy đã BẬT 'Generative Language API' chưa nhé.`;
         } finally {
             aiLoading.style.display = "none";
             generateBtn.disabled = false;
