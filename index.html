@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trịnh Toàn Bách - Thông tin liên hệ</title>
+    <title>Trịnh Toàn Bách - Thông tin liên hệ & Trợ lý AI</title>
     <!-- Sử dụng Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -20,6 +20,7 @@
             --color-email: #EA4335;
             --color-website: #10B981;
             --color-google: #FF5722;
+            --color-ai: linear-gradient(135deg, #8E2DE2, #4A00E0);
         }
 
         * {
@@ -51,7 +52,6 @@
             overflow: hidden;
         }
 
-        /* Hiệu ứng trang trí phía trên card */
         .card::before {
             content: '';
             position: absolute;
@@ -80,7 +80,6 @@
             font-size: 26px;
             font-weight: 800;
             margin-bottom: 5px;
-            /* Đổ màu chữ gradient cho tên */
             background: linear-gradient(to right, #764ba2, #667eea);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -140,17 +139,13 @@
             filter: brightness(1.1);
         }
 
-        /* Màu riêng cho từng nút */
         .btn-facebook { background-color: var(--color-facebook); }
         .btn-zalo { background-color: var(--color-zalo); }
         .btn-tiktok { background-color: var(--color-tiktok); }
         .btn-email { background-color: var(--color-email); }
         .btn-website { background-color: var(--color-website); }
-        .btn-orange { 
-            background-color: var(--color-google);
-            margin-top: 8px;
-            border-radius: 50px; /* Nút tool bo tròn hơn */
-        }
+        .btn-orange { background-color: var(--color-google); margin-top: 8px; border-radius: 50px; }
+        .btn-ai { background: var(--color-ai); border-radius: 50px; margin-top: 5px; }
 
         .footer-info {
             margin-top: 30px;
@@ -162,10 +157,8 @@
             line-height: 1.8;
         }
 
-        .footer-info strong { color: #374151; }
-
-        /* Modal / Popup */
-        #toolPopup {
+        /* Modal Styles */
+        .modal {
             display: none;
             position: fixed;
             top: 0;
@@ -182,42 +175,112 @@
 
         .modal-content {
             width: 100%;
-            max-width: 950px;
-            height: 85vh;
-            background: #000;
+            max-width: 500px;
+            background: white;
             border-radius: 24px;
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid #333;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-header {
-            padding: 15px 25px;
-            background: #1a1a1a;
+            padding: 20px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: white;
         }
 
-        #closeTool {
-            background: #ff4b2b;
+        .modal-body {
+            padding: 20px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .ai-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .ai-input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .ai-input:focus {
+            border-color: #764ba2;
+        }
+
+        .ai-result {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.6;
+            min-height: 100px;
+            white-space: pre-wrap;
+            color: #334155;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .loading-spinner {
+            display: none;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #764ba2;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .close-btn {
+            background: #ef4444;
             color: white;
             border: none;
             border-radius: 50%;
-            width: 32px;
-            height: 32px;
+            width: 30px;
+            height: 30px;
             cursor: pointer;
-            font-size: 22px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        iframe {
-            flex: 1;
+        .ai-action-btn {
+            background: var(--color-ai);
+            color: white;
             border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .ai-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         @media (max-width: 480px) {
@@ -244,21 +307,17 @@
     </div>
 
     <div class="button-group">
-        <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank">
-            Kết bạn Facebook
-        </a>
-        <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank">
-            Kết bạn Zalo
-        </a>
-        <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank">
-            Kênh TikTok
-        </a>
-        <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank">
-            Gửi Email cho tôi
-        </a>
-        <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank">
-            Website Cơ Quan
-        </a>
+        <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank">Kết bạn Facebook</a>
+        <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank">Kết bạn Zalo</a>
+        <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank">Kênh TikTok</a>
+        <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank">Gửi Email cho tôi</a>
+        
+        <!-- Nút Trợ lý AI mới -->
+        <button id="openAI" class="btn btn-ai">
+            ✨ Trợ lý AI Thông minh
+        </button>
+
+        <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank">Website Cơ Quan</a>
         
         <button id="openTool" class="btn btn-orange">
             🔥 Mở Tool Google One
@@ -272,35 +331,129 @@
     </div>
 </div>
 
-<!-- POPUP MODAL -->
-<div id="toolPopup">
+<!-- POPUP TOOL GOOGLE ONE -->
+<div id="toolPopup" class="modal">
+    <div class="modal-content" style="max-width: 950px; height: 85vh; background: #000;">
+        <div class="modal-header" style="background: #1a1a1a; color: white;">
+            <span style="font-weight: 600;">Hệ thống Tool Google One</span>
+            <button id="closeTool" class="close-btn">&times;</button>
+        </div>
+        <iframe src="tool.html" style="flex:1; border:none;"></iframe>
+    </div>
+</div>
+
+<!-- POPUP TRỢ LÝ AI -->
+<div id="aiPopup" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span style="font-weight: 600; letter-spacing: 0.5px;">Hệ thống Tool Google One</span>
-            <button id="closeTool">&times;</button>
+            <span style="font-weight: 700; color: #4A00E0;">✨ Trợ lý AI Toàn Bách</span>
+            <button id="closeAI" class="close-btn">&times;</button>
         </div>
-        <iframe src="tool.html"></iframe>
+        <div class="modal-body">
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">
+                Tôi có thể giúp bạn lên ý tưởng nội dung hoặc viết lời chào truyền cảm hứng.
+            </p>
+            <div class="ai-input-group">
+                <select id="aiPromptType" class="ai-input">
+                    <option value="tiktok">Gợi ý 3 ý tưởng TikTok (về giáo dục/công nghệ)</option>
+                    <option value="quote">Tạo 1 câu nói truyền động lực cho học sinh</option>
+                    <option value="custom">Yêu cầu khác...</option>
+                </select>
+                <input type="text" id="aiCustomInput" class="ai-input" placeholder="Nhập chủ đề bạn muốn..." style="display:none;">
+                <button id="generateBtn" class="ai-action-btn">✨ Tạo nội dung ngay</button>
+            </div>
+            
+            <div id="aiLoading" class="loading-spinner"></div>
+            <div id="aiResult" class="ai-result">Kết quả sẽ hiển thị ở đây...</div>
+        </div>
     </div>
 </div>
 
 <script>
-    const openBtn = document.getElementById("openTool");
-    const closeBtn = document.getElementById("closeTool");
-    const popup = document.getElementById("toolPopup");
+    // --- Cấu hình Gemini API ---
+    const apiKey = ""; // Sẽ được hệ thống cung cấp tự động
 
-    openBtn.onclick = () => {
-        popup.style.display = "flex";
-        document.body.style.overflow = "hidden";
+    async function callGemini(prompt) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{
+                parts: [{ text: prompt }]
+            }],
+            systemInstruction: {
+                parts: [{ text: "Bạn là một trợ lý ảo thông minh cho thầy Trịnh Toàn Bách, một giáo viên và người sáng tạo nội dung công nghệ. Hãy trả lời ngắn gọn, thân thiện, sáng tạo và phù hợp với môi trường giáo dục Việt Nam." }]
+            }
+        };
+
+        let lastError;
+        for (let i = 0; i < 5; i++) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error('API Error');
+                const data = await response.json();
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có kết quả.";
+            } catch (err) {
+                lastError = err;
+                await new Promise(res => setTimeout(res, Math.pow(2, i) * 1000));
+            }
+        }
+        throw lastError;
+    }
+
+    // --- Logic Giao diện ---
+    const toolPopup = document.getElementById("toolPopup");
+    const aiPopup = document.getElementById("aiPopup");
+    const aiResult = document.getElementById("aiResult");
+    const generateBtn = document.getElementById("generateBtn");
+    const aiLoading = document.getElementById("aiLoading");
+    const aiPromptType = document.getElementById("aiPromptType");
+    const aiCustomInput = document.getElementById("aiCustomInput");
+
+    // Xử lý đóng/mở
+    document.getElementById("openTool").onclick = () => { toolPopup.style.display = "flex"; document.body.style.overflow="hidden"; };
+    document.getElementById("closeTool").onclick = () => { toolPopup.style.display = "none"; document.body.style.overflow="auto"; };
+    
+    document.getElementById("openAI").onclick = () => { aiPopup.style.display = "flex"; document.body.style.overflow="hidden"; };
+    document.getElementById("closeAI").onclick = () => { aiPopup.style.display = "none"; document.body.style.overflow="auto"; };
+
+    aiPromptType.onchange = (e) => {
+        aiCustomInput.style.display = e.target.value === "custom" ? "block" : "none";
     };
 
-    const closeModal = () => {
-        popup.style.display = "none";
-        document.body.style.overflow = "auto";
+    // Xử lý gọi AI
+    generateBtn.onclick = async () => {
+        const type = aiPromptType.value;
+        const customText = aiCustomInput.value;
+        let prompt = "";
+
+        if (type === "tiktok") prompt = "Hãy gợi ý 3 ý tưởng làm video ngắn TikTok sáng tạo cho một giáo viên dạy công nghệ để thu hút học sinh.";
+        else if (type === "quote") prompt = "Hãy viết một câu nói ngắn gọn, truyền cảm hứng mạnh mẽ cho học sinh lớp 12 sắp bước vào kỳ thi quan trọng.";
+        else prompt = customText || "Chào bạn!";
+
+        aiResult.innerText = "Đang suy nghĩ...";
+        aiLoading.style.display = "block";
+        generateBtn.disabled = true;
+
+        try {
+            const result = await callGemini(prompt);
+            aiResult.innerText = result;
+        } catch (err) {
+            aiResult.innerText = "Có lỗi xảy ra khi kết nối với AI. Vui lòng thử lại sau.";
+        } finally {
+            aiLoading.style.display = "none";
+            generateBtn.disabled = false;
+        }
     };
 
-    closeBtn.onclick = closeModal;
-    popup.onclick = (e) => { if(e.target === popup) closeModal(); };
-    document.addEventListener('keydown', (e) => { if (e.key === "Escape") closeModal(); });
+    // Click ra ngoài để đóng
+    window.onclick = (e) => {
+        if(e.target === toolPopup) { toolPopup.style.display = "none"; document.body.style.overflow="auto"; }
+        if(e.target === aiPopup) { aiPopup.style.display = "none"; document.body.style.overflow="auto"; }
+    };
 </script>
 
 </body>
