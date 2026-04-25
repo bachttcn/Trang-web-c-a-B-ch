@@ -364,19 +364,16 @@
     const apiKey = rawApiKey.trim();
 
     async function callGemini(prompt) {
-        if (!apiKey || apiKey.includes("DÁN_MÃ")) {
-            return "⚠️ Thầy chưa cấu hình API Key chính xác.";
+        if (!apiKey || apiKey.length < 20) {
+            return "⚠️ Thầy ơi, hình như mã API chưa đúng. Thầy kiểm tra lại trong Google AI Studio nhé!";
         }
 
-        // Chuyển sang v1beta với cấu trúc Payload an toàn nhất
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // Chuyển sang endpoint v1 ổn định nhất
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
-        // Đưa chỉ dẫn hệ thống trực tiếp vào nội dung người dùng để tránh lỗi "systemInstruction"
-        const fullPrompt = `Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp. Nếu người dùng yêu cầu tìm kiếm, hãy cung cấp thông tin mới nhất.\n\nYêu cầu cụ thể: ${prompt}`;
-
         const payload = {
             contents: [{
-                parts: [{ text: fullPrompt }]
+                parts: [{ text: `Bạn là trợ lý AI thân thiện của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời lịch sự và sáng tạo: ${prompt}` }]
             }],
             generationConfig: {
                 temperature: 0.7,
@@ -395,12 +392,14 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(data.error?.message || `Lỗi ${response.status}`);
+                    // Trả về lỗi cụ thể từ Google để thầy dễ xử lý
+                    const errorMsg = data.error?.message || "Lỗi không xác định";
+                    return `❌ Lỗi từ Google: ${errorMsg}. \n\nThầy hãy kiểm tra xem đã "Enable" dịch vụ "Generative Language API" trong Google Cloud dự án này chưa ạ?`;
                 }
 
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không trả về kết quả.";
+                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI đang bận, thầy thử lại sau nhé!";
             } catch (err) {
-                if (i === 2) throw err;
+                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra mạng hoặc API Key nhé.`;
                 await new Promise(res => setTimeout(res, 1000));
             }
         }
