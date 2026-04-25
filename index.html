@@ -360,6 +360,8 @@
 
 <script>
     // API KEY CỦA THẦY BÁCH
+    // Thầy ơi, hãy thử tạo một API Key mới tại: https://aistudio.google.com/app/apikey
+    // Mã ở đó thường sẽ "sạch" và hoạt động ngay mà không cần cấu hình Google Cloud.
     const rawApiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
     const apiKey = rawApiKey.trim();
 
@@ -368,12 +370,12 @@
             return "⚠️ Thầy ơi, hình như mã API chưa đúng. Thầy kiểm tra lại trong Google AI Studio nhé!";
         }
 
-        // Chuyển sang endpoint v1 ổn định nhất
+        // Endpoint v1 chuẩn
         const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
         const payload = {
             contents: [{
-                parts: [{ text: `Bạn là trợ lý AI thân thiện của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời lịch sự và sáng tạo: ${prompt}` }]
+                parts: [{ text: `Bạn là trợ lý AI thân thiện của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự và sáng tạo: ${prompt}` }]
             }],
             generationConfig: {
                 temperature: 0.7,
@@ -392,14 +394,13 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    // Trả về lỗi cụ thể từ Google để thầy dễ xử lý
                     const errorMsg = data.error?.message || "Lỗi không xác định";
-                    return `❌ Lỗi từ Google: ${errorMsg}. \n\nThầy hãy kiểm tra xem đã "Enable" dịch vụ "Generative Language API" trong Google Cloud dự án này chưa ạ?`;
+                    return `❌ Lỗi từ Google: ${errorMsg}. \n\nLưu ý: Nếu lỗi là 'API key not valid', thầy hãy thử tạo mã mới tại Google AI Studio (aistudio.google.com) nhé, mã ở đó hoạt động nhanh hơn.`;
                 }
 
                 return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI đang bận, thầy thử lại sau nhé!";
             } catch (err) {
-                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra mạng hoặc API Key nhé.`;
+                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra mạng nhé.`;
                 await new Promise(res => setTimeout(res, 1000));
             }
         }
