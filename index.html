@@ -359,17 +359,18 @@
 </div>
 
 <script>
-    const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E".trim(); 
+    // Thầy hãy đảm bảo copy chính xác mã từ Google AI Studio và dán vào giữa dấu ""
+    const rawApiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
+    const apiKey = rawApiKey.trim(); // Tự động xóa khoảng trắng dư thừa
 
     async function callGemini(prompt) {
         if (!apiKey || apiKey.includes("DÁN_MÃ")) {
             return "⚠️ Thầy chưa cấu hình API Key chính xác.";
         }
 
-        // Sử dụng cổng kết nối chuẩn Gemini 1.5 Flash
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // Chuyển sang endpoint v1 ổn định nhất
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
-        // Cấu trúc JSON Payload chuẩn cho Gemini
         const payload = {
             contents: [{
                 role: "user",
@@ -380,7 +381,7 @@
             },
             generationConfig: {
                 temperature: 0.7,
-                maxOutputTokens: 1000 // Tên trường chuẩn là camelCase (maxOutputTokens)
+                maxOutputTokens: 1000
             }
         };
 
@@ -395,10 +396,14 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    throw new Error(data.error?.message || `Lỗi ${response.status}`);
+                    const msg = data.error?.message || `Lỗi ${response.status}`;
+                    // Nếu lỗi do khóa không hợp lệ, thông báo cụ thể cho thầy
+                    if (msg.toLowerCase().includes("api key not valid")) {
+                        throw new Error("Mã API không hợp lệ. Thầy vui lòng kiểm tra lại mã khóa trong Google AI Studio hoặc tạo mã mới ạ.");
+                    }
+                    throw new Error(msg);
                 }
 
-                // Trích xuất kết quả từ cấu trúc generateContent
                 return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không trả về kết quả.";
             } catch (err) {
                 if (i === 2) throw err;
@@ -432,7 +437,7 @@
 
         if (type === "tiktok") prompt = "Gợi ý 3 ý tưởng video TikTok giáo dục công nghệ thú vị và mới nhất cho năm 2024.";
         else if (type === "quote") prompt = "Viết 1 lời chúc truyền động lực cho học sinh Trung tâm GDTX chuẩn bị thi tốt nghiệp.";
-        else if (type === "search") prompt = `Hãy tìm hiểu và tóm tắt thông tin chi tiết về: ${customText || "AI trong giáo dục"}`;
+        else if (type === "search") prompt = `Hãy tóm tắt thông tin chi tiết về chủ đề: ${customText || "AI trong giáo dục"}`;
         else prompt = customText || "Chào bạn!";
 
         aiResult.innerText = "Đang kết nối...";
@@ -443,7 +448,7 @@
             const result = await callGemini(prompt);
             aiResult.innerText = result;
         } catch (err) {
-            aiResult.innerText = `❌ Lỗi: ${err.message}`;
+            aiResult.innerText = `❌ ${err.message}`;
         } finally {
             aiLoading.style.display = "none";
             generateBtn.disabled = false;
