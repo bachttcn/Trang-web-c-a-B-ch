@@ -176,7 +176,8 @@
 
         .modal-content {
             width: 100%;
-            max-width: 550px;
+            max-width: 950px;
+            height: 85vh;
             background: white;
             border-radius: 24px;
             overflow: hidden;
@@ -193,66 +194,11 @@
 
         .modal-header {
             padding: 20px;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
+            background: #1a1a1a;
+            color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .modal-body {
-            padding: 20px;
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .ai-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .ai-input {
-            padding: 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .ai-input:focus {
-            border-color: #764ba2;
-        }
-
-        .ai-result {
-            background: #f8fafc;
-            padding: 18px;
-            border-radius: 15px;
-            font-size: 14px;
-            line-height: 1.7;
-            min-height: 120px;
-            white-space: pre-wrap;
-            color: #1e293b;
-            border: 1px solid #e2e8f0;
-        }
-
-        .loading-spinner {
-            display: none;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #764ba2;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            margin: 15px auto;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
 
         .close-btn {
@@ -268,19 +214,6 @@
             align-items: center;
             justify-content: center;
         }
-
-        .ai-action-btn {
-            background: var(--color-ai);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .ai-action-btn:disabled { opacity: 0.6; cursor: wait; }
     </style>
 </head>
 <body>
@@ -306,9 +239,10 @@
         <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank">Kênh TikTok</a>
         <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank">Gửi Email cho tôi</a>
         
-        <button id="openAI" class="btn btn-ai">
-            ✨ Trợ lý AI Thông minh
-        </button>
+        <!-- THAY ĐỔI: Nút AI giờ đây là liên kết trực tiếp đến Google Gemini -->
+        <a href="https://gemini.google.com" class="btn btn-ai" target="_blank">
+            ✨ Trợ lý AI Thông minh (Gemini)
+        </a>
 
         <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank">Website Cơ Quan</a>
         
@@ -316,7 +250,6 @@
             🔥 Mở Tool Google One
         </button>
 
-        <!-- NÚT G1 ĐÃ CHUYỂN XUỐNG DƯỚI CÙNG -->
         <a href="https://toanbach.vercel.app/tooldoitoken-bach.html" class="btn btn-g1" target="_blank">
             tooldoitoken-BACH: CHUYỂN GÓI G1
         </a>
@@ -329,10 +262,10 @@
     </div>
 </div>
 
-<!-- POPUP TOOL -->
+<!-- POPUP TOOL GOOGLE ONE (GIỮ NGUYÊN) -->
 <div id="toolPopup" class="modal">
-    <div class="modal-content" style="max-width: 950px; height: 85vh; background: #000;">
-        <div class="modal-header" style="background: #1a1a1a; color: white;">
+    <div class="modal-content">
+        <div class="modal-header">
             <span>Hệ thống Tool Google One</span>
             <button id="closeTool" class="close-btn">&times;</button>
         </div>
@@ -340,116 +273,14 @@
     </div>
 </div>
 
-<!-- POPUP AI -->
-<div id="aiPopup" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span style="font-weight: 700; color: #4A00E0;">✨ Trợ lý AI Toàn Bách</span>
-            <button id="closeAI" class="close-btn">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="ai-input-group">
-                <select id="aiPromptType" class="ai-input">
-                    <option value="tiktok">🎬 Ý tưởng video TikTok giáo dục</option>
-                    <option value="quote">✍️ Lời chúc truyền cảm hứng cho học sinh</option>
-                    <option value="search">🔍 Tìm kiếm thông tin trên Internet</option>
-                    <option value="custom">💬 Yêu cầu tự do...</option>
-                </select>
-                <input type="text" id="aiCustomInput" class="ai-input" placeholder="Nhập yêu cầu của thầy..." style="display:none;">
-                <button id="generateBtn" class="ai-action-btn">Gửi yêu cầu tới AI ✨</button>
-            </div>
-            <div id="aiLoading" class="loading-spinner"></div>
-            <div id="aiResult" class="ai-result">Chào thầy Bách! Hãy chọn một yêu cầu để tôi hỗ trợ nhé.</div>
-        </div>
-    </div>
-</div>
-
 <script>
-    /**
-     * QUAN TRỌNG CHO VERCEL:
-     * Thầy hãy dán mã API Key của mình vào giữa dấu ngoặc kép ở dòng dưới.
-     * Ví dụ: const apiKey = "AIzaSyD4PZY7OIa40U7iOZfA0pM4bihch7FhgxI";
-     */
-    const apiKey = "AIzaSyD4PZY7OIa40U7iOZfA0pM4bihch7FhgxI"; 
-
-    async function callGemini(prompt) {
-        // Tự động chọn Model: Nếu có Key cá nhân thì dùng 1.5-flash (chuẩn), nếu không có thì dùng preview (Canvas)
-        const modelName = apiKey ? "gemini-1.5-flash" : "gemini-2.5-flash-preview-09-2025";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
-        
-        const systemPrompt = "Bạn là trợ lý AI thông minh của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự và chuyên nghiệp.";
-        const payload = {
-            contents: [{ parts: [{ text: `${systemPrompt}\n\n${prompt}` }] }]
-        };
-
-        // Cơ chế thử lại (Exponential Backoff)
-        let delay = 1000;
-        for (let i = 0; i < 5; i++) {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await response.json();
-                if (response.ok) {
-                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi.";
-                }
-                if (data.error) throw new Error(data.error.message);
-            } catch (err) {
-                if (i === 4) throw err;
-                await new Promise(res => setTimeout(res, delay));
-                delay *= 2;
-            }
-        }
-        return "⚠️ Có lỗi xảy ra. Hãy kiểm tra lại API Key hoặc mạng.";
-    }
-
     const toolPopup = document.getElementById("toolPopup");
-    const aiPopup = document.getElementById("aiPopup");
-    const aiResult = document.getElementById("aiResult");
-    const generateBtn = document.getElementById("generateBtn");
-    const aiLoading = document.getElementById("aiLoading");
-    const aiPromptType = document.getElementById("aiPromptType");
-    const aiCustomInput = document.getElementById("aiCustomInput");
 
     document.getElementById("openTool").onclick = () => { toolPopup.style.display = "flex"; };
     document.getElementById("closeTool").onclick = () => { toolPopup.style.display = "none"; };
-    document.getElementById("openAI").onclick = () => { aiPopup.style.display = "flex"; };
-    document.getElementById("closeAI").onclick = () => { aiPopup.style.display = "none"; };
-
-    aiPromptType.onchange = (e) => {
-        aiCustomInput.style.display = (e.target.value === "custom" || e.target.value === "search") ? "block" : "none";
-    };
-
-    generateBtn.onclick = async () => {
-        const type = aiPromptType.value;
-        const customText = aiCustomInput.value.trim();
-        let prompt = "";
-
-        if (type === "tiktok") prompt = "Gợi ý 3 ý tưởng video TikTok giáo dục công nghệ thú vị cho thầy giáo năm 2024.";
-        else if (type === "quote") prompt = "Viết 1 lời chúc truyền cảm hứng cho học sinh Trung tâm GDTX Cầu Ngang sắp thi tốt nghiệp.";
-        else if (type === "search") prompt = `Tóm tắt kiến thức mới nhất về: ${customText || "AI 2024"}`;
-        else prompt = customText || "Chào bạn!";
-
-        aiResult.innerText = "Đang kết nối...";
-        aiLoading.style.display = "block";
-        generateBtn.disabled = true;
-
-        try {
-            const result = await callGemini(prompt);
-            aiResult.innerText = result;
-        } catch (err) {
-            aiResult.innerText = `❌ Lỗi: ${err.message}. (Thầy nhớ điền API Key vào code khi đưa lên Vercel nhé)`;
-        } finally {
-            aiLoading.style.display = "none";
-            generateBtn.disabled = false;
-        }
-    };
 
     window.onclick = (e) => {
         if(e.target === toolPopup) toolPopup.style.display = "none";
-        if(e.target === aiPopup) aiPopup.style.display = "none";
     };
 </script>
 
