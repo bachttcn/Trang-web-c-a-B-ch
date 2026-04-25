@@ -368,20 +368,20 @@
             return "⚠️ Thầy ơi, hình như mã API chưa đúng. Thầy kiểm tra lại nhé!";
         }
 
-        // SỬ DỤNG V1BETA ĐỂ TƯƠNG THÍCH TỐT NHẤT VỚI FLASH 1.5
+        // SỬ DỤNG ENDPOINT v1beta VỚI MODEL FLASH 1.5 MỚI NHẤT
+        // Lưu ý: Thêm "models/" trước tên mô hình để tránh lỗi 404
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
+        // Gộp chỉ dẫn hệ thống vào Prompt để đảm bảo tương thích mọi phiên bản API
+        const finalPrompt = `Bạn là một trợ lý ảo thông minh và thân thiện của thầy Trịnh Toàn Bách - giáo viên tại Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, phong cách lịch sự, chuyên nghiệp. Nếu nội dung cần kiến thức mới, hãy giả định bạn có thông tin đến năm 2024-2025. Yêu cầu: ${prompt}`;
+
         const payload = {
-            // "system_instruction" CÓ DẤU GẠCH DƯỚI LÀ CHUẨN CỦA GEMINI
-            system_instruction: {
-                parts: [{ text: "Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời bằng tiếng Việt, phong cách lịch sự, chuyên nghiệp và sáng tạo." }]
-            },
             contents: [{
-                parts: [{ text: prompt }]
+                parts: [{ text: finalPrompt }]
             }],
             generationConfig: {
-                temperature: 0.8,
-                maxOutputTokens: 1000
+                temperature: 0.7,
+                maxOutputTokens: 2048
             }
         };
 
@@ -397,33 +397,20 @@
                 
                 if (!response.ok) {
                     const errorMsg = data.error?.message || "Lỗi không xác định";
-                    // Nếu lỗi do phiên bản không hỗ trợ system_instruction, ta lồng chỉ dẫn vào nội dung
-                    if (errorMsg.includes("system_instruction")) {
-                         delete payload.system_instruction;
-                         payload.contents[0].parts[0].text = `Chỉ dẫn: Bạn là trợ lý của thầy Bách. Trả lời yêu cầu sau: ${prompt}`;
-                         return callGeminiManual(prompt, payload);
-                    }
-                    return `❌ Lỗi từ Google: ${errorMsg}`;
+                    return `❌ Lỗi từ Google: ${errorMsg}. (Thầy hãy kiểm tra xem API Key này đã được cấp quyền cho Gemini 1.5 Flash chưa ạ?)`;
                 }
 
-                return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI đang bận, thầy thử lại nhé!";
+                // Trích xuất văn bản từ kết quả của Gemini
+                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+                    return data.candidates[0].content.parts[0].text;
+                } else {
+                    return "AI đã tiếp nhận nhưng chưa thể trả lời câu này. Thầy thử lại nhé!";
+                }
             } catch (err) {
-                if (i === 2) return `❌ Lỗi kết nối: ${err.message}`;
+                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra lại mạng hoặc API Key nhé.`;
                 await new Promise(res => setTimeout(res, 1000));
             }
         }
-    }
-
-    // Hàm dự phòng nếu system_instruction gặp lỗi trên một số Key
-    async function callGeminiManual(prompt, fallbackPayload) {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(fallbackPayload)
-        });
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không phản hồi.";
     }
 
     const toolPopup = document.getElementById("toolPopup");
