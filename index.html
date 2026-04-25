@@ -20,6 +20,7 @@
             --color-email: #EA4335;
             --color-website: #10B981;
             --color-google: #FF5722;
+            --color-g1: #6366f1; /* Màu mới cho nút G1 */
             --color-ai: linear-gradient(135deg, #8E2DE2, #4A00E0);
         }
 
@@ -127,7 +128,7 @@
             text-decoration: none;
             border-radius: 16px;
             font-weight: 600;
-            font-size: 15px;
+            font-size: 14px;
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
@@ -144,6 +145,7 @@
         .btn-tiktok { background-color: var(--color-tiktok); }
         .btn-email { background-color: var(--color-email); }
         .btn-website { background-color: var(--color-website); }
+        .btn-g1 { background-color: var(--color-g1); border: 1px solid rgba(255,255,255,0.2); } /* Style cho nút mới */
         .btn-orange { background-color: var(--color-google); margin-top: 8px; border-radius: 50px; }
         .btn-ai { background: var(--color-ai); border-radius: 50px; margin-top: 5px; }
 
@@ -302,6 +304,12 @@
     <div class="button-group">
         <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank">Kết bạn Facebook</a>
         <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank">Kết bạn Zalo</a>
+        
+        <!-- NÚT MỚI THẦY YÊU CẦU -->
+        <a href="https://tooldoitoken-bach.vercel.app/" class="btn btn-g1" target="_blank">
+            tooldoitoken-BACH: CHUYỂN GÓI G1
+        </a>
+
         <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank">Kênh TikTok</a>
         <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank">Gửi Email cho tôi</a>
         
@@ -359,76 +367,35 @@
 </div>
 
 <script>
-    // API KEY MỚI CỦA THẦY BÁCH
-    const rawApiKey = "AIzaSyD4PZY7OIa40U7iOZfA0pM4bihch7FhgxI"; 
-    const apiKey = rawApiKey.trim();
+    const apiKey = ""; // API Key sẽ được môi trường nạp tự động
 
     async function callGemini(prompt) {
-        if (!apiKey || apiKey.length < 20) {
-            return "⚠️ Thầy ơi, hình như mã API chưa đúng. Thầy kiểm tra lại nhé!";
-        }
-
-        // THAY ĐỔI URL SANG v1 (PHIÊN BẢN CHÍNH THỨC)
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
         
-        // GỘP CHỈ DẪN HỆ THỐNG VÀO PROMPT ĐỂ TRÁNH LỖI PHIÊN BẢN
         const systemPrompt = "Bạn là trợ lý AI thông minh của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự và chuyên nghiệp.";
-        const finalPrompt = `${systemPrompt}\n\nYêu cầu từ người dùng: ${prompt}`;
-
         const payload = {
-            contents: [{
-                parts: [{ text: finalPrompt }]
-            }],
-            generationConfig: {
-                temperature: 0.7,
-                maxOutputTokens: 2048
-            }
+            contents: [{ parts: [{ text: `${systemPrompt}\n\n${prompt}` }] }]
         };
 
-        for (let i = 0; i < 3; i++) {
+        let delay = 1000;
+        for (let i = 0; i < 5; i++) {
             try {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                
                 const data = await response.json();
-                
-                if (!response.ok) {
-                    const errorMsg = data.error?.message || "Lỗi không xác định";
-                    
-                    // NẾU VẪN LỖI MODEL NOT FOUND, CỐ GẮNG DÙNG MODEL CŨ HƠN
-                    if (errorMsg.includes("not found")) {
-                        return await callFallbackGemini(prompt);
-                    }
-                    
-                    return `❌ Lỗi từ Google: ${errorMsg}. (Thầy hãy xem lại mục Credentials trong Google Cloud nhé)`;
-                }
-
-                if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-                    return data.candidates[0].content.parts[0].text;
-                } else {
-                    return "AI đã nhận lệnh nhưng chưa có câu trả lời. Thầy thử lại nhé!";
+                if (response.ok) {
+                    return data.candidates?.[0]?.content?.parts?.[0]?.text || "Không có phản hồi từ AI.";
                 }
             } catch (err) {
-                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra mạng hoặc API Key nhé.`;
-                await new Promise(res => setTimeout(res, 1000));
+                if (i === 4) throw err;
+                await new Promise(res => setTimeout(res, delay));
+                delay *= 2;
             }
         }
-    }
-
-    // HÀM DỰ PHÒNG DÙNG MODEL GEMINI-PRO NẾU FLASH KHÔNG CÓ TRÊN KEY CỦA THẦY
-    async function callFallbackGemini(prompt) {
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
-        const payload = { contents: [{ parts: [{ text: prompt }] }] };
-        try {
-            const response = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-            const data = await response.json();
-            return data.candidates[0].content.parts[0].text;
-        } catch (e) {
-            return "❌ Key này hiện chưa được Google kích hoạt cho Gemini 1.5. Thầy hãy đợi vài giờ hoặc tạo Key mới tại Google AI Studio nhé.";
-        }
+        return "⚠️ Có lỗi xảy ra khi gọi AI. Vui lòng thử lại sau.";
     }
 
     const toolPopup = document.getElementById("toolPopup");
@@ -466,7 +433,7 @@
             const result = await callGemini(prompt);
             aiResult.innerText = result;
         } catch (err) {
-            aiResult.innerText = `❌ ${err.message}`;
+            aiResult.innerText = `❌ Lỗi: ${err.message}`;
         } finally {
             aiLoading.style.display = "none";
             generateBtn.disabled = false;
