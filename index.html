@@ -6,54 +6,55 @@
 <title>Trịnh Toàn Bách - Thông tin liên hệ & Trợ lý AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-    :root {
-        --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --card-bg: #ffffff;
-        --text-main: #1f2937;
-        --text-muted: #4b5563;
-        --color-facebook: #1877F2;
-        --color-zalo: #0068FF;
-        --color-tiktok: #000000;
-        --color-email: #EA4335;
-        --color-website: #10B981;
-        --color-google: #FF5722;
-        --color-ai: linear-gradient(135deg, #8E2DE2, #4A00E0);
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body { font-family:'Inter', sans-serif; background:var(--primary-bg); display:flex; justify-content:center; align-items:center; min-height:100vh; padding:20px; color:var(--text-main); }
-    .card { background:var(--card-bg); width:100%; max-width:420px; padding:40px 25px; border-radius:30px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); text-align:center; position:relative; overflow:hidden; }
-    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:5px; background:linear-gradient(to right,#ff5722,#764ba2,#667eea); }
-    .avatar-container { margin-bottom:20px; }
-    .avatar { width:130px; height:130px; border-radius:50%; object-fit:cover; border:4px solid #fff; box-shadow:0 10px 20px rgba(118,75,162,0.2); background:#f3f4f6; }
-    .info-section h1 { font-size:26px; font-weight:800; margin-bottom:5px; background:linear-gradient(to right,#764ba2,#667eea); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-    .info-section h2 { font-size:16px; font-weight:600; margin-bottom:15px; color:#4b5563; line-height:1.4; }
-    .tags { font-size:13px; color:#6b7280; margin-bottom:25px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; }
-    .tag-item { background:#f3f4f6; padding:4px 12px; border-radius:20px; font-weight:500; }
-    .button-group { display:flex; flex-direction:column; gap:12px; }
-    .btn { display:flex; align-items:center; justify-content:center; gap:10px; width:100%; padding:14px; color:#ffffff; text-decoration:none; border-radius:16px; font-weight:600; font-size:15px; transition:all 0.3s ease; border:none; cursor:pointer; }
-    .btn:hover { transform:translateY(-3px); box-shadow:0 8px 15px rgba(0,0,0,0.1); filter:brightness(1.1); }
-    .btn-facebook { background-color:var(--color-facebook); }
-    .btn-zalo { background-color:var(--color-zalo); }
-    .btn-tiktok { background-color:var(--color-tiktok); }
-    .btn-email { background-color:var(--color-email); }
-    .btn-website { background-color:var(--color-website); }
-    .btn-orange { background-color:var(--color-google); margin-top:8px; border-radius:50px; }
-    .btn-ai { background:var(--color-ai); border-radius:50px; margin-top:5px; }
-    .footer-info { margin-top:30px; font-size:12px; color:#6b7280; background:#f9fafb; padding:20px; border-radius:20px; line-height:1.8; }
-    .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); backdrop-filter:blur(8px); z-index:10000; justify-content:center; align-items:center; padding:20px; }
-    .modal-content { width:100%; max-width:550px; background:white; border-radius:24px; overflow:hidden; display:flex; flex-direction:column; animation:slideUp 0.3s ease-out; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1); }
-    @keyframes slideUp { from{transform:translateY(50px);opacity:0;} to{transform:translateY(0);opacity:1;} }
-    .modal-header { padding:20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; }
-    .modal-body { padding:20px; max-height:70vh; overflow-y:auto; }
-    .ai-input-group { display:flex; flex-direction:column; gap:12px; margin-bottom:20px; }
-    .ai-input { padding:12px 15px; border:2px solid #e2e8f0; border-radius:12px; font-family:inherit; font-size:14px; outline:none; transition:border-color 0.2s; }
-    .ai-input:focus { border-color:#764ba2; }
-    .ai-result { background:#f8fafc; padding:18px; border-radius:15px; font-size:14px; line-height:1.7; min-height:120px; white-space:pre-wrap; color:#1e293b; border:1px solid #e2e8f0; }
-    .loading-spinner { display:none; border:3px solid #f3f3f3; border-top:3px solid #764ba2; border-radius:50%; width:24px; height:24px; animation:spin 1s linear infinite; margin:15px auto; }
-    @keyframes spin {0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
-    .close-btn { background:#ef4444; color:white; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:20px; display:flex; align-items:center; justify-content:center; }
-    .ai-action-btn { background: var(--color-ai); color:white; border:none; padding:12px 20px; border-radius:12px; font-weight:700; cursor:pointer; transition: opacity 0.2s; }
-    .ai-action-btn:disabled { opacity:0.6; cursor:wait; }
+:root {
+    --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --card-bg: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --color-facebook: #1877F2;
+    --color-zalo: #0068FF;
+    --color-tiktok: #000000;
+    --color-email: #EA4335;
+    --color-website: #10B981;
+    --color-google: #FF5722;
+    --color-ai: linear-gradient(135deg, #8E2DE2, #4A00E0);
+}
+/* CSS cũ giữ nguyên */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--primary-bg);display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;color:var(--text-main);}
+.card{background:var(--card-bg);width:100%;max-width:420px;padding:40px 25px;border-radius:30px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.3);text-align:center;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(to right,#ff5722,#764ba2,#667eea);}
+.avatar-container{margin-bottom:20px;}
+.avatar{width:130px;height:130px;border-radius:50%;object-fit:cover;border:4px solid #fff;box-shadow:0 10px 20px rgba(118,75,162,0.2);background:#f3f4f6;}
+.info-section h1{font-size:26px;font-weight:800;margin-bottom:5px;background:linear-gradient(to right,#764ba2,#667eea);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.info-section h2{font-size:16px;font-weight:600;margin-bottom:15px;color:#4b5563;line-height:1.4;}
+.tags{font-size:13px;color:#6b7280;margin-bottom:25px;display:flex;justify-content:center;gap:10px;flex-wrap:wrap;}
+.tag-item{background:#f3f4f6;padding:4px 12px;border-radius:20px;font-weight:500;}
+.button-group{display:flex;flex-direction:column;gap:12px;}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;color:#ffffff;text-decoration:none;border-radius:16px;font-weight:600;font-size:15px;transition:all 0.3s ease;border:none;cursor:pointer;}
+.btn:hover{transform:translateY(-3px);box-shadow:0 8px 15px rgba(0,0,0,0.1);filter:brightness(1.1);}
+.btn-facebook{background-color:var(--color-facebook);}
+.btn-zalo{background-color:var(--color-zalo);}
+.btn-tiktok{background-color:var(--color-tiktok);}
+.btn-email{background-color:var(--color-email);}
+.btn-website{background-color:var(--color-website);}
+.btn-orange{background-color:var(--color-google);margin-top:8px;border-radius:50px;}
+.btn-ai{background:var(--color-ai);border-radius:50px;margin-top:5px;}
+.footer-info{margin-top:30px;font-size:12px;color:#6b7280;background:#f9fafb;padding:20px;border-radius:20px;line-height:1.8;}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:10000;justify-content:center;align-items:center;padding:20px;}
+.modal-content{width:100%;max-width:550px;background:white;border-radius:24px;overflow:hidden;display:flex;flex-direction:column;animation:slideUp 0.3s ease-out;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);}
+@keyframes slideUp{from{transform:translateY(50px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.modal-header{padding:20px;background:#f8fafc;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;}
+.modal-body{padding:20px;max-height:70vh;overflow-y:auto;}
+.ai-input-group{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.ai-input{padding:12px 15px;border:2px solid #e2e8f0;border-radius:12px;font-family:inherit;font-size:14px;outline:none;transition:border-color 0.2s;}
+.ai-input:focus{border-color:#764ba2;}
+.ai-result{background:#f8fafc;padding:18px;border-radius:15px;font-size:14px;line-height:1.7;min-height:120px;white-space:pre-wrap;color:#1e293b;border:1px solid #e2e8f0;}
+.loading-spinner{display:none;border:3px solid #f3f3f3;border-top:3px solid #764ba2;border-radius:50%;width:24px;height:24px;animation:spin 1s linear infinite;margin:15px auto;}
+@keyframes spin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+.close-btn{background:#ef4444;color:white;border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;}
+.ai-action-btn{background: var(--color-ai);color:white;border:none;padding:12px 20px;border-radius:12px;font-weight:700;cursor:pointer;transition: opacity 0.2s;}
+.ai-action-btn:disabled{opacity:0.6;cursor:wait;}
 </style>
 </head>
 <body>
@@ -62,7 +63,6 @@
     <div class="avatar-container">
         <img src="https://github.com/bachttcn/Trang-web-c-a-B-ch/blob/main/Bach.png?raw=true" alt="Trịnh Toàn Bách" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=Toan+Bach&background=764ba2&color=fff'">
     </div>
-
     <div class="info-section">
         <h1>TRỊNH TOÀN BÁCH</h1>
         <h2>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h2>
@@ -72,7 +72,6 @@
             <span class="tag-item">🚀 Yêu công nghệ</span>
         </div>
     </div>
-
     <div class="button-group">
         <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank">Kết bạn Facebook</a>
         <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank">Kết bạn Zalo</a>
@@ -82,7 +81,6 @@
         <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank">Website Cơ Quan</a>
         <button id="openTool" class="btn btn-orange">🔥 Mở Tool Google One</button>
     </div>
-
     <div class="footer-info">
         <p><strong>MBBank:</strong> 0945814468</p>
         <p><strong>AgriBank:</strong> 0945814468</p>
@@ -92,12 +90,12 @@
 
 <!-- POPUP TOOL -->
 <div id="toolPopup" class="modal">
-    <div class="modal-content" style="max-width:950px; height:85vh; background:#000;">
-        <div class="modal-header" style="background:#1a1a1a; color:white;">
+    <div class="modal-content" style="max-width:950px;height:85vh;background:#000;">
+        <div class="modal-header" style="background:#1a1a1a;color:white;">
             <span>Hệ thống Tool Google One</span>
             <button id="closeTool" class="close-btn">&times;</button>
         </div>
-        <iframe src="tool.html" style="flex:1; border:none;"></iframe>
+        <iframe src="tool.html" style="flex:1;border:none;"></iframe>
     </div>
 </div>
 
@@ -105,7 +103,7 @@
 <div id="aiPopup" class="modal">
     <div class="modal-content">
         <div class="modal-header">
-            <span style="font-weight:700; color:#4A00E0;">✨ Trợ lý AI Toàn Bách</span>
+            <span style="font-weight:700;color:#4A00E0;">✨ Trợ lý AI Toàn Bách</span>
             <button id="closeAI" class="close-btn">&times;</button>
         </div>
         <div class="modal-body">
@@ -128,50 +126,43 @@
 <script>
 const apiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E".trim();
 
-// ✅ Hàm callGemini mới chuẩn Generative Language API
-async function callGemini(prompt) {
-    if (!apiKey || apiKey.includes("DÁN_MÃ")) {
-        return "⚠️ Thầy chưa cấu hình API Key chính xác trong mã nguồn.";
-    }
-    const url = `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateMessage?key=${apiKey}`;
-    const payload = {
-        model: "models/text-bison-001",
-        temperature: 0.7,
-        max_output_tokens: 256,
-        messages: [
-            { role: "system", content: "Bạn là trợ lý AI của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp." },
-            { role: "user", content: prompt }
+// Hàm callGemini chuẩn v1beta2 text-bison-001
+async function callGemini(prompt){
+    if(!apiKey||apiKey.includes("DÁN_MÃ")) return "⚠️ Thầy chưa cấu hình API Key chính xác.";
+    const url=`https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateMessage?key=${apiKey}`;
+    const payload={
+        model:"models/text-bison-001",
+        temperature:0.7,
+        max_output_tokens:256,
+        messages:[
+            {role:"system",content:"Bạn là trợ lý AI của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp."},
+            {role:"user",content:prompt}
         ]
     };
-    try {
-        const response = await fetch(url,{
+    try{
+        const response=await fetch(url,{
             method:'POST',
             headers:{'Content-Type':'application/json'},
             body:JSON.stringify(payload)
         });
-        const data = await response.json();
-        if(!response.ok){
-            const errorMsg = data.error?.message || `Lỗi kết nối (${response.status})`;
-            throw new Error(errorMsg);
-        }
-        return data?.messages?.[0]?.content?.[0]?.text || "AI không trả về kết quả. Thử lại nhé.";
-    }catch(err){
-        return `❌ Lỗi: ${err.message}`;
-    }
+        const data=await response.json();
+        if(!response.ok) throw new Error(data.error?.message||`Lỗi kết nối (${response.status})`);
+        return data?.messages?.[0]?.content?.[0]?.text||"AI không trả về kết quả. Thử lại nhé.";
+    }catch(err){ return `❌ Lỗi: ${err.message}`; }
 }
 
-const toolPopup = document.getElementById("toolPopup");
-const aiPopup = document.getElementById("aiPopup");
-const aiResult = document.getElementById("aiResult");
-const generateBtn = document.getElementById("generateBtn");
-const aiLoading = document.getElementById("aiLoading");
-const aiPromptType = document.getElementById("aiPromptType");
-const aiCustomInput = document.getElementById("aiCustomInput");
+const toolPopup=document.getElementById("toolPopup");
+const aiPopup=document.getElementById("aiPopup");
+const aiResult=document.getElementById("aiResult");
+const generateBtn=document.getElementById("generateBtn");
+const aiLoading=document.getElementById("aiLoading");
+const aiPromptType=document.getElementById("aiPromptType");
+const aiCustomInput=document.getElementById("aiCustomInput");
 
-document.getElementById("openTool").onclick = ()=>{toolPopup.style.display="flex";};
-document.getElementById("closeTool").onclick = ()=>{toolPopup.style.display="none";};
-document.getElementById("openAI").onclick = ()=>{aiPopup.style.display="flex";};
-document.getElementById("closeAI").onclick = ()=>{aiPopup.style.display="none";};
+document.getElementById("openTool").onclick=()=>{toolPopup.style.display="flex";};
+document.getElementById("closeTool").onclick=()=>{toolPopup.style.display="none";};
+document.getElementById("openAI").onclick=()=>{aiPopup.style.display="flex";};
+document.getElementById("closeAI").onclick=()=>{aiPopup.style.display="none";};
 aiPromptType.onchange=(e)=>{aiCustomInput.style.display=(e.target.value==="custom"||e.target.value==="search")?"block":"none";};
 
 generateBtn.onclick=async()=>{
@@ -201,5 +192,6 @@ window.onclick=(e)=>{
     if(e.target===aiPopup) aiPopup.style.display="none";
 };
 </script>
+
 </body>
 </html>
