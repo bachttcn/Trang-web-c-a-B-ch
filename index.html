@@ -368,12 +368,12 @@
             return "⚠️ Thầy ơi, hình như mã API chưa đúng. Thầy kiểm tra lại nhé!";
         }
 
-        // SỬ DỤNG ENDPOINT v1beta VỚI MODEL FLASH 1.5 MỚI NHẤT
-        // Lưu ý: Thêm "models/" trước tên mô hình để tránh lỗi 404
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // THAY ĐỔI URL SANG v1 (PHIÊN BẢN CHÍNH THỨC)
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
-        // Gộp chỉ dẫn hệ thống vào Prompt để đảm bảo tương thích mọi phiên bản API
-        const finalPrompt = `Bạn là một trợ lý ảo thông minh và thân thiện của thầy Trịnh Toàn Bách - giáo viên tại Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, phong cách lịch sự, chuyên nghiệp. Nếu nội dung cần kiến thức mới, hãy giả định bạn có thông tin đến năm 2024-2025. Yêu cầu: ${prompt}`;
+        // GỘP CHỈ DẪN HỆ THỐNG VÀO PROMPT ĐỂ TRÁNH LỖI PHIÊN BẢN
+        const systemPrompt = "Bạn là trợ lý AI thông minh của thầy Trịnh Toàn Bách - giáo viên tại Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự và chuyên nghiệp.";
+        const finalPrompt = `${systemPrompt}\n\nYêu cầu từ người dùng: ${prompt}`;
 
         const payload = {
             contents: [{
@@ -397,19 +397,37 @@
                 
                 if (!response.ok) {
                     const errorMsg = data.error?.message || "Lỗi không xác định";
-                    return `❌ Lỗi từ Google: ${errorMsg}. (Thầy hãy kiểm tra xem API Key này đã được cấp quyền cho Gemini 1.5 Flash chưa ạ?)`;
+                    
+                    // NẾU VẪN LỖI MODEL NOT FOUND, CỐ GẮNG DÙNG MODEL CŨ HƠN
+                    if (errorMsg.includes("not found")) {
+                        return await callFallbackGemini(prompt);
+                    }
+                    
+                    return `❌ Lỗi từ Google: ${errorMsg}. (Thầy hãy xem lại mục Credentials trong Google Cloud nhé)`;
                 }
 
-                // Trích xuất văn bản từ kết quả của Gemini
                 if (data.candidates && data.candidates[0] && data.candidates[0].content) {
                     return data.candidates[0].content.parts[0].text;
                 } else {
-                    return "AI đã tiếp nhận nhưng chưa thể trả lời câu này. Thầy thử lại nhé!";
+                    return "AI đã nhận lệnh nhưng chưa có câu trả lời. Thầy thử lại nhé!";
                 }
             } catch (err) {
-                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra lại mạng hoặc API Key nhé.`;
+                if (i === 2) return `❌ Lỗi kết nối: ${err.message}. Thầy kiểm tra mạng hoặc API Key nhé.`;
                 await new Promise(res => setTimeout(res, 1000));
             }
+        }
+    }
+
+    // HÀM DỰ PHÒNG DÙNG MODEL GEMINI-PRO NẾU FLASH KHÔNG CÓ TRÊN KEY CỦA THẦY
+    async function callFallbackGemini(prompt) {
+        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+        const payload = { contents: [{ parts: [{ text: prompt }] }] };
+        try {
+            const response = await fetch(url, { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            const data = await response.json();
+            return data.candidates[0].content.parts[0].text;
+        } catch (e) {
+            return "❌ Key này hiện chưa được Google kích hoạt cho Gemini 1.5. Thầy hãy đợi vài giờ hoặc tạo Key mới tại Google AI Studio nhé.";
         }
     }
 
