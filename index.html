@@ -359,26 +359,25 @@
 </div>
 
 <script>
-    // Thầy hãy đảm bảo copy chính xác mã từ Google AI Studio và dán vào giữa dấu ""
+    // API KEY CỦA THẦY BÁCH
     const rawApiKey = "AIzaSyCT65-wv-MP-P1_H6UOYB2zCNgO8pqtk-E"; 
-    const apiKey = rawApiKey.trim(); // Tự động xóa khoảng trắng dư thừa
+    const apiKey = rawApiKey.trim();
 
     async function callGemini(prompt) {
         if (!apiKey || apiKey.includes("DÁN_MÃ")) {
             return "⚠️ Thầy chưa cấu hình API Key chính xác.";
         }
 
-        // Chuyển sang endpoint v1 ổn định nhất
-        const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        // Chuyển sang v1beta với cấu trúc Payload an toàn nhất
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
         
+        // Đưa chỉ dẫn hệ thống trực tiếp vào nội dung người dùng để tránh lỗi "systemInstruction"
+        const fullPrompt = `Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp. Nếu người dùng yêu cầu tìm kiếm, hãy cung cấp thông tin mới nhất.\n\nYêu cầu cụ thể: ${prompt}`;
+
         const payload = {
             contents: [{
-                role: "user",
-                parts: [{ text: prompt }]
+                parts: [{ text: fullPrompt }]
             }],
-            systemInstruction: {
-                parts: [{ text: "Bạn là trợ lý ảo của thầy Trịnh Toàn Bách - giáo viên Trung tâm GDNN-GDTX Cầu Ngang. Hãy trả lời bằng tiếng Việt, lịch sự, sáng tạo và chuyên nghiệp." }]
-            },
             generationConfig: {
                 temperature: 0.7,
                 maxOutputTokens: 1000
@@ -396,12 +395,7 @@
                 const data = await response.json();
                 
                 if (!response.ok) {
-                    const msg = data.error?.message || `Lỗi ${response.status}`;
-                    // Nếu lỗi do khóa không hợp lệ, thông báo cụ thể cho thầy
-                    if (msg.toLowerCase().includes("api key not valid")) {
-                        throw new Error("Mã API không hợp lệ. Thầy vui lòng kiểm tra lại mã khóa trong Google AI Studio hoặc tạo mã mới ạ.");
-                    }
-                    throw new Error(msg);
+                    throw new Error(data.error?.message || `Lỗi ${response.status}`);
                 }
 
                 return data.candidates?.[0]?.content?.parts?.[0]?.text || "AI không trả về kết quả.";
