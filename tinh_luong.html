@@ -1,0 +1,244 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tính lương tham khảo NĐ 182/2026/NĐ-CP</title>
+    <style>
+        body {
+            background-color: #e0e0e0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+        }
+        .calculator-container {
+            background-color: #fffde7; /* Nền màu vàng nhạt */
+            color: #003366; /* Chữ xanh đậm */
+            width: 100%;
+            max-width: 480px;
+            padding: 20px;
+            border: 4px solid #003366; /* Nét đậm */
+            border-radius: 12px;
+            box-shadow: 8px 8px 15px rgba(0, 0, 0, 0.4); /* Khung viền bóng đổ */
+            box-sizing: border-box;
+        }
+        h2 {
+            color: #ff0000; /* Tiêu đề màu đỏ */
+            font-size: 22px; /* Chữ to */
+            font-weight: bold; /* Đậm */
+            text-align: center;
+            line-height: 1.4;
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #003366;
+            border-radius: 6px;
+            font-size: 16px;
+            color: #003366;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            font-weight: bold;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #ff0000;
+        }
+        .btn-calc {
+            width: 100%;
+            padding: 14px;
+            background-color: #003366;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border: 2px solid #001a33;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 4px 4px 10px rgba(0,0,0,0.3);
+            margin-top: 10px;
+            transition: all 0.2s ease;
+        }
+        .btn-calc:active {
+            box-shadow: 1px 1px 5px rgba(0,0,0,0.3);
+            transform: translateY(2px);
+        }
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border: 3px dashed #003366;
+            background-color: #fff9c4;
+            border-radius: 8px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 4px;
+        }
+        .result-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff0000;
+            border-bottom: none;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid #003366;
+        }
+        .text-danger { color: #d32f2f; font-weight: bold; }
+        .text-success { color: #2e7d32; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h2>Tính lương tham khảo NĐ 182/2026/NĐ-CP<br><span style="font-size: 14px; color: #003366;">(Phát triển bởi thầy Trịnh Toàn Bách)</span></h2>
+    
+    <div class="form-group">
+        <label>Lương cơ sở (VNĐ)</label>
+        <select id="luongCoSo">
+            <option value="2340000">2.340.000 VNĐ (Hiện hành)</option>
+            <option value="2527200">2.530.000 VNĐ (Dự kiến +8% từ 01/07/2026)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Đối tượng / Cấp dạy</label>
+        <select id="doiTuong" onchange="capNhatPhuCapUuDai()">
+            <option value="45">Giáo viên Mầm non (45%)</option>
+            <option value="45">Giáo viên Tiểu học (45%)</option>
+            <option value="40">Giáo viên THCS (40%)</option>
+            <option value="40">Giáo viên THPT (40%)</option>
+            <option value="40" selected>Giáo viên TT GDNN-GDTX (40%)</option>
+            <option value="70">Vùng đặc biệt khó khăn (70%)</option>
+        </select>
+    </div>
+
+    <div class="form-group" style="display:flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>Hệ số lương</label>
+            <input type="number" id="heSoLuong" step="0.01" value="2.34" placeholder="Ví dụ: 2.34, 4.0">
+        </div>
+        <div style="flex: 1;">
+            <label>PC Ưu đãi (%)</label>
+            <input type="number" id="pcUuDai" value="40">
+        </div>
+    </div>
+
+    <div class="form-group" style="display:flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>PC Chức vụ (Hệ số)</label>
+            <input type="number" id="pcChucVu" step="0.01" value="0.0" placeholder="0.2, 0.3...">
+        </div>
+        <div style="flex: 1;">
+            <label>PC Khu vực (Hệ số)</label>
+            <input type="number" id="pcKhuVuc" step="0.01" value="0.0">
+        </div>
+    </div>
+
+    <div class="form-group" style="display:flex; gap: 10px;">
+        <div style="flex: 1;">
+            <label>PC Thâm niên (%)</label>
+            <input type="number" id="pcThamNien" value="0">
+        </div>
+        <div style="flex: 1;">
+            <label>PC Vượt khung (%)</label>
+            <input type="number" id="pcVuotKhung" value="0">
+        </div>
+    </div>
+
+    <button class="btn-calc" onclick="tinhLuong()">TÍNH LƯƠNG</button>
+
+    <div class="result-box" id="ketQua" style="display: none;">
+        <div class="result-row"><span>Lương chính:</span> <span id="lblLuongChinh">0 đ</span></div>
+        <div class="result-row"><span>Phụ cấp ưu đãi:</span> <span id="lblPcUuDai">0 đ</span></div>
+        <div class="result-row"><span>Phụ cấp chức vụ:</span> <span id="lblPcChucVu">0 đ</span></div>
+        <div class="result-row"><span>Phụ cấp thâm niên:</span> <span id="lblPcThamNien">0 đ</span></div>
+        <div class="result-row"><span>Phụ cấp vượt khung:</span> <span id="lblPcVuotKhung">0 đ</span></div>
+        <div class="result-row"><span>Phụ cấp khu vực:</span> <span id="lblPcKhuVuc">0 đ</span></div>
+        <div class="result-row"><strong>TỔNG LƯƠNG GỘP:</strong> <strong class="text-success" id="lblTongLuong">0 đ</strong></div>
+        <div class="result-row"><span class="text-danger">Trừ BHYT (1.5%):</span> <span class="text-danger" id="lblBHYT">0 đ</span></div>
+        <div class="result-row"><span class="text-danger">Trừ BHXH, BHTN (9%):</span> <span class="text-danger" id="lblBHKhac">0 đ</span></div>
+        <div class="result-row total"><span>THỰC NHẬN:</span> <span id="lblThucNhan">0 đ</span></div>
+    </div>
+</div>
+
+<script>
+    function capNhatPhuCapUuDai() {
+        var doiTuongVal = document.getElementById('doiTuong').value;
+        document.getElementById('pcUuDai').value = doiTuongVal;
+    }
+
+    function formatVND(n) {
+        return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " đ";
+    }
+
+    function tinhLuong() {
+        var luongCoSo = parseFloat(document.getElementById('luongCoSo').value) || 0;
+        var heSoLuong = parseFloat(document.getElementById('heSoLuong').value) || 0;
+        var pcUuDai = parseFloat(document.getElementById('pcUuDai').value) || 0;
+        var pcChucVu = parseFloat(document.getElementById('pcChucVu').value) || 0;
+        var pcKhuVuc = parseFloat(document.getElementById('pcKhuVuc').value) || 0;
+        var pcThamNien = parseFloat(document.getElementById('pcThamNien').value) || 0;
+        var pcVuotKhung = parseFloat(document.getElementById('pcVuotKhung').value) || 0;
+
+        // Tính các hệ số thành phần
+        var heSoVuotKhung = heSoLuong * (pcVuotKhung / 100);
+        var heSoDongBH = heSoLuong + pcChucVu + heSoVuotKhung; 
+        var heSoThamNien = heSoDongBH * (pcThamNien / 100);
+        
+        // Tính tiền thành phần
+        var luongChinh = heSoLuong * luongCoSo;
+        var tienPcChucVu = pcChucVu * luongCoSo;
+        var tienPcKhuVuc = pcKhuVuc * luongCoSo;
+        var tienPcVuotKhung = heSoVuotKhung * luongCoSo;
+        var tienPcThamNien = heSoThamNien * luongCoSo;
+        
+        // PC Ưu đãi tính trên: (HS Lương + PC Chức vụ + PC Vượt khung) x LCS x % Ưu đãi
+        var tienPcUuDai = heSoDongBH * luongCoSo * (pcUuDai / 100);
+
+        var tongLuongGop = luongChinh + tienPcChucVu + tienPcKhuVuc + tienPcVuotKhung + tienPcThamNien + tienPcUuDai;
+
+        // Tính các khoản đóng bảo hiểm (Tính trên: Lương + PC CV + PC VK + PC TN)
+        var tongTienTinhBH = (heSoDongBH + heSoThamNien) * luongCoSo;
+        var tienBHYT = tongTienTinhBH * 0.015; // 1.5%
+        var tienBHKhac = tongTienTinhBH * 0.09;  // BHXH 8% + BHTN 1%
+
+        var thucNhan = tongLuongGop - (tienBHYT + tienBHKhac);
+
+        // Hiển thị kết quả
+        document.getElementById('lblLuongChinh').innerText = formatVND(luongChinh);
+        document.getElementById('lblPcUuDai').innerText = formatVND(tienPcUuDai);
+        document.getElementById('lblPcChucVu').innerText = formatVND(tienPcChucVu);
+        document.getElementById('lblPcThamNien').innerText = formatVND(tienPcThamNien);
+        document.getElementById('lblPcVuotKhung').innerText = formatVND(tienPcVuotKhung);
+        document.getElementById('lblPcKhuVuc').innerText = formatVND(tienPcKhuVuc);
+        document.getElementById('lblTongLuong').innerText = formatVND(tongLuongGop);
+        document.getElementById('lblBHYT').innerText = "-" + formatVND(tienBHYT);
+        document.getElementById('lblBHKhac').innerText = "-" + formatVND(tienBHKhac);
+        document.getElementById('lblThucNhan').innerText = formatVND(thucNhan);
+
+        document.getElementById('ketQua').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
