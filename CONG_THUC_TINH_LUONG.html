@@ -1,14 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <title>Tính lương giáo viên</title>
 
 <style>
-body{font-family:Arial;padding:20px}
-input{margin:5px;padding:5px;width:120px}
-.box{border:1px solid #ccc;padding:15px;margin-top:10px}
-h2{color:#2c3e50}
+body{
+    font-family: Arial;
+    padding: 20px;
+}
+
+input{
+    margin: 5px;
+    padding: 6px;
+    width: 160px;
+}
+
+.box{
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-top: 15px;
+}
+
+h2{
+    color: #2c3e50;
+}
+
+button{
+    padding: 8px 15px;
+    cursor: pointer;
+}
 </style>
 
 </head>
@@ -17,11 +38,20 @@ h2{color:#2c3e50}
 
 <h2>TÍNH LƯƠNG GIÁO VIÊN</h2>
 
-Hệ số lương: <input id="hs" value="4.68"><br>
-Lương cơ sở: <input id="lcs" value="2340000"><br>
-Hệ số chức vụ: <input id="hs_cv" value="0.15"><br>
-Ưu đãi (%): <input id="ud" value="0.3"><br>
-Thâm niên nghề (%): <input id="tn" value="0.21"><br>
+Hệ số lương:
+<input id="hs" value="4.68" placeholder="Ví dụ: 4.68 hoặc 4,68"><br>
+
+Lương cơ sở:
+<input id="lcs" value="2340000" placeholder="Ví dụ: 2340000"><br>
+
+Hệ số chức vụ:
+<input id="hs_cv" placeholder="Ví dụ: 0.15 hoặc 0,15"><br>
+
+Ưu đãi (%):
+<input id="ud" placeholder="Ví dụ: 30"><br>
+
+Thâm niên nghề (%):
+<input id="tn" placeholder="Ví dụ: 22"><br>
 
 <button onclick="tinh()">Tính lương</button>
 
@@ -29,64 +59,110 @@ Thâm niên nghề (%): <input id="tn" value="0.21"><br>
 
 <script>
 
+// Hàm đọc số: chấp nhận cả dấu chấm và dấu phẩy
+function so(id){
+    let value = document.getElementById(id).value.trim();
+
+    if(value === ""){
+        return 0;
+    }
+
+    // Đổi dấu phẩy thành dấu chấm
+    value = value.replace(",", ".");
+
+    let number = parseFloat(value);
+
+    if(isNaN(number)){
+        return 0;
+    }
+
+    return number;
+}
+
+// Hàm đọc lương cơ sở
+function tien(id){
+    let value = document.getElementById(id).value.trim();
+
+    if(value === ""){
+        return 0;
+    }
+
+    // Xóa dấu cách
+    value = value.replace(/\s/g, "");
+
+    // Nếu nhập 2.340.000 hoặc 2,340,000 thì xóa dấu ngăn cách
+    value = value.replace(/[.,]/g, "");
+
+    let number = parseFloat(value);
+
+    if(isNaN(number)){
+        return 0;
+    }
+
+    return number;
+}
+
 function tinh(){
 
-let hs = parseFloat(document.getElementById("hs").value);
-let lcs = parseFloat(document.getElementById("lcs").value);
-let hs_cv = parseFloat(document.getElementById("hs_cv").value);
-let ud = parseFloat(document.getElementById("ud").value);
-let tn = parseFloat(document.getElementById("tn").value);
+    let hs = so("hs");
+    let lcs = tien("lcs");
+    let hs_cv = so("hs_cv");
 
-// ===== 1. Lương =====
-let luong = hs * lcs;
+    // Nhập 30 sẽ hiểu là 30%
+    // Nhập 22 sẽ hiểu là 22%
+    let ud = so("ud") / 100;
+    let tn = so("tn") / 100;
 
-// ===== 2. Phụ cấp chức vụ =====
-let pc_cv = hs_cv * lcs;
+    // ===== 1. Lương hệ số =====
+    let luong = hs * lcs;
 
-// ===== 3. Thâm niên nghề (có chức vụ) =====
-let tn_nghe = (luong + pc_cv) * tn;
+    // ===== 2. Phụ cấp chức vụ =====
+    let pc_cv = hs_cv * lcs;
 
-// ===== 4. PHỤ CẤP ƯU ĐÃI (ĐÃ CỘNG CHỨC VỤ) =====
-let uu_dai = (luong + pc_cv) * ud;
+    // ===== 3. Thâm niên nghề =====
+    let tn_nghe = (luong + pc_cv) * tn;
 
-// ===== 5. Tổng =====
-let tong = luong + pc_cv + tn_nghe + uu_dai;
+    // ===== 4. Phụ cấp ưu đãi =====
+    let uu_dai = (luong + pc_cv) * ud;
 
-// ===== 6. Lương bảo hiểm =====
-let luong_bh = luong + pc_cv + tn_nghe;
+    // ===== 5. Tổng thu nhập =====
+    let tong = luong + pc_cv + tn_nghe + uu_dai;
 
-// ===== 7. Khấu trừ =====
-let bhxh = luong_bh * 0.08;
-let bhyt = luong_bh * 0.015;
-let bhtn = luong_bh * 0.01;
+    // ===== 6. Lương đóng bảo hiểm =====
+    let luong_bh = luong + pc_cv + tn_nghe;
 
-// ===== 8. Thực lãnh =====
-let thuc_lanh = tong - (bhxh + bhyt + bhtn);
+    // ===== 7. Các khoản trừ =====
+    let bhxh = luong_bh * 0.08;
+    let bhyt = luong_bh * 0.015;
+    let bhtn = luong_bh * 0.01;
 
-// ===== UI =====
-document.getElementById("kq").innerHTML = `
-<b>LƯƠNG CHI TIẾT</b><br><br>
+    // ===== 8. Thực lãnh =====
+    let thuc_lanh = tong - (bhxh + bhyt + bhtn);
 
-Lương hệ số: ${luong.toLocaleString()} đ<br>
-Phụ cấp chức vụ: ${pc_cv.toLocaleString()} đ<br>
-Thâm niên nghề: ${tn_nghe.toLocaleString()} đ<br>
-Phụ cấp ưu đãi: ${uu_dai.toLocaleString()} đ<br>
+    // ===== Hiển thị kết quả =====
+    document.getElementById("kq").innerHTML = `
+        <h3 style="margin-top:0">LƯƠNG CHI TIẾT</h3>
 
-<hr>
+        Lương hệ số: ${luong.toLocaleString("vi-VN")} đ<br>
+        Phụ cấp chức vụ: ${pc_cv.toLocaleString("vi-VN")} đ<br>
+        Thâm niên nghề: ${tn_nghe.toLocaleString("vi-VN")} đ<br>
+        Phụ cấp ưu đãi: ${uu_dai.toLocaleString("vi-VN")} đ<br>
 
-<b>Tổng thu nhập:</b> ${tong.toLocaleString()} đ<br><br>
+        <hr>
 
-<b>CÁC KHOẢN TRỪ</b><br>
-BHXH (8%): ${bhxh.toLocaleString()} đ<br>
-BHYT (1.5%): ${bhyt.toLocaleString()} đ<br>
-BHTN (1%): ${bhtn.toLocaleString()} đ<br>
+        <b>Tổng thu nhập:</b> ${tong.toLocaleString("vi-VN")} đ<br><br>
 
-<hr>
+        <b>CÁC KHOẢN TRỪ</b><br>
+        BHXH (8%): ${bhxh.toLocaleString("vi-VN")} đ<br>
+        BHYT (1.5%): ${bhyt.toLocaleString("vi-VN")} đ<br>
+        BHTN (1%): ${bhtn.toLocaleString("vi-VN")} đ<br>
 
-<b style="color:green;font-size:18px">
-THỰC LÃNH: ${thuc_lanh.toLocaleString()} đ
-</b>
-`;
+        <hr>
+
+        <b style="color:green;font-size:28px">
+        THỰC LÃNH: ${thuc_lanh.toLocaleString("vi-VN")} đ
+        </b>
+    `;
 }
 
 </script>
