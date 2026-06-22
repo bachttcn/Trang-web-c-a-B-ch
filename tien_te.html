@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Currency Converter - Premium Edition</title>
+    <style>
+        body {
+            background-color: #0e2f17; /* Màu xanh lục đặc trưng */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .wise-container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            padding: 32px;
+            border-radius: 24px;
+            box-shadow: 0px 10px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+        }
+        .rate-info {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .rate-title {
+            font-size: 14px;
+            color: #5d7079;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .rate-value {
+            font-size: 19px;
+            color: #000000;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .form-group {
+            position: relative;
+            margin-bottom: 12px;
+        }
+        .form-group label {
+            display: block;
+            color: #2e434e;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .input-box {
+            display: flex;
+            align-items: center;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 8px 16px;
+            background-color: #ffffff;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .input-box:focus-within {
+            border-color: #000000;
+            box-shadow: 0 0 0 1px #000000;
+        }
+        .input-box input.amount-input {
+            flex: 1;
+            border: none;
+            padding: 12px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #000000;
+            outline: none;
+            width: 55%;
+            background: transparent;
+        }
+        
+        .custom-select-wrapper {
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+        .select-trigger {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #000000;
+            padding: 8px 12px;
+            border-radius: 10px;
+            transition: background-color 0.15s;
+        }
+        .select-trigger:hover {
+            background-color: #f2f5f7;
+        }
+        .select-trigger::after {
+            content: "";
+            border: solid #5d7079;
+            border-width: 0 2px 2px 0;
+            display: inline-block;
+            padding: 3px;
+            transform: rotate(45deg);
+            margin-left: 4px;
+            margin-top: -4px;
+        }
+        
+        .flag-icon {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+            background-color: #cbd5e1;
+        }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: 120%;
+            right: -8px;
+            width: 340px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0px 12px 32px rgba(0, 0, 0, 0.18);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: fadeIn 0.15s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .dropdown-menu.show {
+            display: flex;
+        }
+        .search-box-wrapper {
+            padding: 12px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .search-input:focus {
+            border-color: #25c974;
+        }
+        .options-list {
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .option-item:hover {
+            background-color: #f8fafc;
+            color: #000000;
+        }
+        
+        .swap-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: -8px 0;
+            position: relative;
+            z-index: 5;
+        }
+        .swap-circle {
+            background-color: #9fe870;
+            color: #0e2f17;
+            border: none;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s;
+        }
+        .swap-circle:hover {
+            transform: scale(1.08);
+        }
+        .update-time {
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 24px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wise-container">
+    <div class="rate-info">
+        <div class="rate-title">Live Exchange Rate ⓘ</div>
+        <div class="rate-value" id="lblLiveRate">1 TWD = 831,58 VND</div>
+    </div>
+    
+    <div class="form-group">
+        <label>You send</label>
+        <div class="input-box">
+            <input type="text" id="fromAmount" class="amount-input" value="1000" oninput="xuLyGoPhim(this, true)">
+            
+            <div class="custom-select-wrapper" id="wrapper-from">
+                <div class="select-trigger" id="trigger-from" onclick="toggleDropdown(event, 'from')">
+                    <img src="https://flagcdn.com/w40/tw.png" class="flag-icon"> TWD
+                </div>
+                <div class="dropdown-menu" id="menu-from">
+                    <div class="search-box-wrapper">
+                        <input type="text" class="search-input" placeholder="Type currency code or country..." oninput="filterCurrencies('from')">
+                    </div>
+                    <div class="options-list" id="list-from"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="swap-wrapper">
+        <button class="swap-circle" onclick="daoNguocTienTe()">⇅</button>
+    </div>
+
+    <div class="form-group" style="margin-top: 4px;">
+        <label>Recipient gets</label>
+        <div class="input-box">
+            <input type="text" id="toAmount" class="amount-input" value="831580" oninput="xuLyGoPhim(this, false)">
+            
+            <div class="custom-select-wrapper" id="wrapper-to">
+                <div class="select-trigger" id="trigger-to" onclick="toggleDropdown(event, 'to')">
+                    <img src="https://flagcdn.com/w40/vn.png" class="flag-icon"> VND
+                </div>
+                <div class="dropdown-menu" id="menu-to">
+                    <div class="search-box-wrapper">
+                        <input type="text" class="search-input" placeholder="Type currency code or country..." oninput="filterCurrencies('to')">
+                    </div>
+                    <div class="options-list" id="list-to"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="update-time" id="lblTime">Smart Offline Mode Ready</div>
+</div>
+
+<script>
+    // Đã lọc sạch toàn bộ ký tự Latin lạ để tránh lỗi Encoding hệ thống (ANSI) gây chết script
+    const currencyNames = {
+        "USD": "United States Dollar", "EUR": "Euro", "JPY": "Japanese Yen", "GBP": "British Pound Sterling",
+        "AUD": "Australian Dollar", "CAD": "Canadian Dollar", "CHF": "Swiss Franc", "CNY": "Chinese Yuan",
+        "HKD": "Hong Kong Dollar", "NZD": "New Zealand Dollar", "SEK": "Swedish Krona", "KRW": "South Korean Won",
+        "SGD": "Singapore Dollar", "NOK": "Norwegian Krone", "MXN": "Mexican Peso", "INR": "Indian Rupee",
+        "RUB": "Russian Ruble", "ZAR": "South African Rand", "TRY": "Turkish Lira", "BRL": "Brazilian Real",
+        "TWD": "New Taiwan Dollar", "VND": "Vietnamese Dong", "THB": "Thai Baht", "IDR": "Indonesian Rupiah",
+        "MYR": "Malaysian Ringgit", "PHP": "Philippine Peso", "AED": "United Arab Emirates Dirham", "AFN": "Afghan Afghani",
+        "ALL": "Albanian Lek", "AMD": "Armenian Dram", "ANG": "Netherlands Antillean Guilder", "AOA": "Angolan Kwanza",
+        "ARS": "Argentine Peso", "AWG": "Aruban Florin", "AZN": "Azerbaijani Manat", "BAM": "Bosnia-Herzegovina Mark",
+        "BBD": "Barbadian Dollar", "BDT": "Bangladeshi Taka", "BGN": "Bulgarian Lev", "BHD": "Bahraini Dinar",
+        "BIF": "Burundian Franc", "BMD": "Bermudan Dollar", "BND": "Brunei Dollar", "BOB": "Bolivian Boliviano",
+        "BSD": "Bahamian Dollar", "BTN": "Bhutanese Ngultrum", "BWP": "Botswanan Pula", "BYN": "Belarusian Ruble",
+        "BZD": "Belize Dollar", "CDF": "Congolese Franc", "CLP": "Chilean Peso", "COP": "Colombian Peso",
+        "CRC": "Costa Rican Colon", "CUP": "Cuban Peso", "CVE": "Cape Verdean Escudo", "CZK": "Czech Koruna",
+        "DJF": "Djiboutian Franc", "DKK": "Danish Krone", "DOP": "Dominican Peso", "DZD": "Algerian Dinar",
+        "EGP": "Egyptian Pound", "ERN": "Eritrean Nakfa", "ETB": "Ethiopian Birr", "FJD": "Fijian Dollar",
+        "FKP": "Falkland Islands Pound", "FOK": "Faroe Islands Krona", "GEL": "Georgian Lari", "GGP": "Guernsey Pound",
+        "GHS": "Ghanaian Cedi", "GIP": "Gibraltar Pound", "GMD": "Gambian Dalasi", "GNF": "Guinean Franc",
+        "GTQ": "Guatemalan Quetzal", "GYD": "Guyanese Dollar", "HNL": "Honduran Lempira", "HRK": "Croatian Kuna",
+        "HTG": "Haitian Gourde", "HUF": "Hungarian Forint", "ILS": "Israeli New Shekel", "IMP": "Manx Pound",
+        "IQD": "Iraqi Dinar", "IRR": "Iranian Rial", "ISK": "Icelandic Krona", "JEP": "Jersey Pound",
+        "JMD": "Jamaican Dollar", "JOD": "Jordanian Dinar", "KES": "Kenyan Shilling", "KGS": "Kyrgystani Som",
+        "KHR": "Cambodian Riel", "KID": "Kiribati Dollar", "KMF": "Comorian Franc", "KPW": "North Korean Won",
+        "KWD": "Kuwaiti Dinar", "KYD": "Cayman Islands Dollar", "KZT": "Kazakhstani Tenge", "LAK": "Laotian Kip",
+        "LBP": "Lebanese Pound", "LKR": "Sri Lankan Rupee", "LRD": "Liberian Dollar", "LSL": "Lesotho Loti",
+        "LYD": "Libyan Dinar", "MAD": "Moroccan Dirham", "MDL": "Moldovan Leu", "MGA": "Malagasy Ariary",
+        "MKD": "Macedonian Denar", "MMK": "Myanmar Kyat", "MNT": "Mongolian Tugrik", "MOP": "Macanese Pataca",
+        "MRU": "Mauritanian Ouguiya", "MUR": "Mauritian Rupee", "MVR": "Maldivian Rufiyaah", "MWK": "Malawian Kwacha",
+        "MZN": "Mozambican Metical", "NAD": "Namibian Dollar", "NGN": "Nigerian Naira", "NIO": "Nicaraguan Cordoba",
+        "NPR": "Nepalese Rupee", "OMR": "Oman Rial", "PAB": "Panamanian Balboa", "PEN": "Peruvian Sol",
+        "PGK": "Papua New Guinean Kina", "PKR": "Pakistan Rupee", "PLN": "Polish Zloty", "PYG": "Paraguayan Guarani",
+        "QAR": "Qatari Rial", "RON": "Romanian Leu", "RSD": "Serbian Dinar", "RWF": "Rwanda Franc",
+        "SAR": "Saudi Riyal", "SBD": "Solomon Islands Dollar", "SCR": "Seychellois Rupee", "SDG": "Sudanese Pound",
+        "SHP": "Saint Helena Pound", "SLE": "Sierra Leonean Leone", "SLL": "Sierra Leonean Leone", "SOS": "Somali Shilling",
+        "SRD": "Surinamese Dollar", "SSP": "South Sudanese Pound", "STN": "Sao Tome and Principe Dobra", "SYP": "Syrian Pound",
+        "SZL": "Eswatini Lilangeni", "TJS": "Tajikistani Somoni", "TMT": "Turkmenistan Manat", "TND": "Tunisian Dinar",
+        "TOP": "Tongan Paanga", "TVD": "Tuvaluan Dollar", "TZS": "Tanzanian Shilling", "UAH": "Ukrainian Hryvnia",
+        "UGX": "Ugandian Shilling", "UYU": "Uruguayan Peso", "UZS": "Uzbekistani Som", "VES": "Venezuelan Bolivar",
+        "VUV": "Vanuatu Vatu", "WST": "Samoan Tala", "XAF": "Central African CFA Franc", "XCD": "East Caribbean Dollar",
+        "XDR": "Special Drawing Rights", "XOF": "West African CFA Franc", "XPF": "CFP Franc",
+        "YER": "Yemeni Rial", "ZMW": "Zambian Kwacha", "ZWG": "Zimbabwe Gold", "ZWL": "Zimbabwean Dollar"
+    };
+
+    let selectedFrom = "TWD";
+    let selectedTo = "VND";
+    let allCurrencyCodes = Object.keys(currencyNames);
+    
+    // Core Offline Data: Cơ sở dữ liệu tỷ giá dự phòng (gốc USD = 1) giúp chạy mượt ngay cả khi không có mạng
+    const offlineRatesToUSD = {
+        "USD": 1, "EUR": 0.93, "TWD": 32.5, "VND": 25400, "JPY": 156, "GBP": 0.79, 
+        "AUD": 1.51, "CAD": 1.37, "CHF": 0.90, "CNY": 7.25, "HKD": 7.81, "SGD": 1.35, 
+        "THB": 36.7, "KRW": 1375, "MYR": 4.71, "IDR": 16200, "PHP": 58.5, "INR": 83.5
+    };
+
+    let liveRatesData = null; // Sẽ được nạp khi gọi API thành công
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Định dạng số hiển thị ban đầu ngay lập tức
+        let fromInput = document.getElementById('fromAmount');
+        fromInput.value = dinhDangDauCham(chuyenThanhSoThuanTuy(fromInput.value));
+        
+        renderList("from");
+        renderList("to");
+        
+        // Kích hoạt tính toán offline trước để màn hình KHÔNG bị đứng hình chờ mạng
+        tinhToanChuyenDoi(true);
+        
+        // Gọi ngầm dữ liệu live từ máy chủ toàn cầu
+        taiTyGiaHeThong();
+        
+        window.addEventListener('click', function(e) {
+            if (!document.getElementById('wrapper-from').contains(e.target)) document.getElementById('menu-from').classList.remove('show');
+            if (!document.getElementById('wrapper-to').contains(e.target)) document.getElementById('menu-to').classList.remove('show');
+        });
+    });
+
+    function layTyGiaHienTai() {
+        if (liveRatesData && liveRatesData[selectedTo]) {
+            return liveRatesData[selectedTo];
+        }
+        // Công thức tính quy đổi chéo thông minh qua gốc USD khi offline
+        const tuGia = offlineRatesToUSD[selectedFrom] || 1;
+        const denGia = offlineRatesToUSD[selectedTo] || 1;
+        return denGia / tuGia;
+    }
+
+    function layUrlCo(maTien) {
+        let code2 = maTien.substring(0, 2).toLowerCase();
+        if (maTien === "EUR") code2 = "eu";
+        if (maTien === "USD") code2 = "us";
+        return `https://flagcdn.com/w40/${code2}.png`;
+    }
+
+    function dinhDangDauCham(num) {
+        if (isNaN(num) || num === null) return "0";
+        let phan = num.toString().split(".");
+        phan[0] = phan[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        return phan.join(",");
+    }
+
+    function chuyenThanhSoThuanTuy(str) {
+        if(!str) return 0;
+        return parseFloat(str.replace(/\./g, "").replace(/,/g, ".")) || 0;
+    }
+
+    function xuLyGoPhim(inputEl, isFromInput) {
+        let viTriChuot = inputEl.selectionStart;
+        let chieuDaiCu = inputEl.value.length;
+
+        let soThuanTuy = inputEl.value.replace(/\./g, "").replace(/[^0-9]/g, "");
+        if (!soThuanTuy) {
+            inputEl.value = "";
+            tinhToanChuyenDoi(isFromInput);
+            return;
+        }
+
+        let giaTriSo = parseInt(soThuanTuy, 10);
+        let chuoiDinhDangMoi = dinhDangDauCham(giaTriSo);
+        inputEl.value = chuoiDinhDangMoi;
+
+        let chieuDaiMoi = chuoiDinhDangMoi.length;
+        let viTriMoi = viTriChuot + (chieuDaiMoi - chieuDaiCu);
+        inputEl.setSelectionRange(viTriMoi, viTriMoi);
+
+        tinhToanChuyenDoi(isFromInput);
+    }
+
+    function renderList(type, filterText = "") {
+        const listContainer = document.getElementById(`list-${type}`);
+        if(!listContainer) return;
+        listContainer.innerHTML = "";
+        const searchKey = filterText.toLowerCase().trim();
+
+        allCurrencyCodes.forEach(code => {
+            const countryName = currencyNames[code] || "Global Currency";
+            const flagUrl = layUrlCo(code);
+            const fullTextToSearch = (code + " " + countryName).toLowerCase();
+            
+            if (fullTextToSearch.includes(searchKey)) {
+                const item = document.createElement('div');
+                item.className = "option-item";
+                item.innerHTML = `<img src="${flagUrl}" class="flag-icon" onerror="this.onerror=null; this.style.visibility='hidden';"> <span><strong>${code}</strong> - ${countryName}</span>`;
+                item.onclick = function() {
+                    selectCurrency(type, code);
+                };
+                listContainer.appendChild(item);
+            }
+        });
+    }
+
+    function toggleDropdown(e, type) {
+        e.stopPropagation();
+        const currentMenu = document.getElementById(`menu-${type}`);
+        const otherType = type === "from" ? "to" : "from";
+        document.getElementById(`menu-${otherType}`).classList.remove('show');
+        
+        currentMenu.classList.toggle('show');
+        
+        if (currentMenu.classList.contains('show')) {
+            const sInput = currentMenu.querySelector('.search-input');
+            sInput.value = "";
+            sInput.focus();
+            renderList(type, "");
+        }
+    }
+
+    function filterCurrencies(type) {
+        const menu = document.getElementById(`menu-${type}`);
+        const text = menu.querySelector('.search-input').value;
+        renderList(type, text);
+    }
+
+    function selectCurrency(type, code) {
+        if (type === 'from') {
+            selectedFrom = code;
+            document.getElementById('trigger-from').innerHTML = `<img src="${layUrlCo(code)}" class="flag-icon"> ${code}`;
+        } else {
+            selectedTo = code;
+            document.getElementById('trigger-to').innerHTML = `<img src="${layUrlCo(code)}" class="flag-icon"> ${code}`;
+        }
+        document.getElementById(`menu-${type}`).classList.remove('show');
+        taiTyGiaHeThong();
+    }
+
+    async function taiTyGiaHeThong() {
+        try {
+            const response = await fetch(`https://open.er-api.com/v6/latest/${selectedFrom}`);
+            if(!response.ok) throw new Error("Network blocked");
+            const data = await response.json();
+            
+            if (data && data.result === "success") {
+                liveRatesData = data.rates;
+                
+                Object.keys(data.rates).forEach(m => {
+                    if(!allCurrencyCodes.includes(m)) {
+                        allCurrencyCodes.push(m);
+                    }
+                });
+
+                const thoiGian = new Date(data.time_last_update_unix * 1000).toLocaleString('vi-VN');
+                document.getElementById('lblTime').innerText = `Live update: ${thoiGian}`;
+                tinhToanChuyenDoi(true);
+            } else {
+                throw new Error("API error status");
+            }
+        } catch (error) {
+            // Khắc phục lỗi treo: Nếu dính CORS hoặc mất mạng, chuyển chế độ Local mượt mà
+            document.getElementById('lblTime').innerText = "Smart Offline Mode (Local Rates)";
+            tinhToanChuyenDoi(true);
+        }
+    }
+
+    function tinhToanChuyenDoi(isFromInput) {
+        const rate = layTyGiaHienTai();
+        
+        if (isFromInput) {
+            const inputVal = chuyenThanhSoThuanTuy(document.getElementById('fromAmount').value);
+            document.getElementById('toAmount').value = dinhDangDauCham(Math.round(inputVal * rate));
+        } else {
+            const outputVal = chuyenThanhSoThuanTuy(document.getElementById('toAmount').value);
+            document.getElementById('fromAmount').value = rate > 0 ? dinhDangDauCham(Math.round(outputVal / rate)) : "0";
+        }
+
+        // Luôn cập nhật thông số tỷ giá hiển thị ở đầu khung
+        document.getElementById('lblLiveRate').innerText = `1 ${selectedFrom} = ${dinhDangDauCham(Math.round(rate * 100) / 100)} ${selectedTo}`;
+    }
+
+    function daoNguocTienTe() {
+        const temp = selectedFrom;
+        selectedFrom = selectedTo;
+        selectedTo = temp;
+
+        document.getElementById('trigger-from').innerHTML = `<img src="${layUrlCo(selectedFrom)}" class="flag-icon"> ${selectedFrom}`;
+        document.getElementById('trigger-to').innerHTML = `<img src="${layUrlCo(selectedTo)}" class="flag-icon"> ${selectedTo}`;
+        
+        // Nếu đã có sẵn bộ dữ liệu live cũ thì đảo ngược tính toán luôn trước khi fetch lại
+        if(liveRatesData) liveRatesData = null; 
+        
+        taiTyGiaHeThong();
+    }
+</script>
+
+</body>
+</html>
