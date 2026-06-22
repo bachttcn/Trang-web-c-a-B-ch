@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trịnh Toàn Bách - Thông tin liên hệ & Trợ lý AI</title>
+
     <!-- Sử dụng Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --primary-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --card-bg: #ffffff;
             --text-main: #1f2937;
             --text-muted: #4b5563;
-            
+
             /* Brand Colors */
             --color-facebook: #1877F2;
             --color-zalo: #0068FF;
@@ -132,30 +134,67 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
+            text-align: center;
+            line-height: 1.4;
         }
 
         .btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
             filter: brightness(1.1);
         }
 
-        .btn-facebook { background-color: var(--color-facebook); }
-        .btn-zalo { background-color: var(--color-zalo); }
-        .btn-tiktok { background-color: var(--color-tiktok); }
-        .btn-email { background-color: var(--color-email); }
-        .btn-website { background-color: var(--color-website); }
-        .btn-g1 { background-color: var(--color-g1); border: 1px solid rgba(255,255,255,0.2); }
-        .btn-orange { background-color: var(--color-google); margin-top: 8px; border-radius: 50px; }
-        .btn-ai { background: var(--color-ai); border-radius: 50px; margin-top: 5px; }
-        .btn-salary { background: linear-gradient(135deg, #06b6d4, #2563eb);
-    border-radius: 18px;
-}
+        .btn-facebook {
+            background-color: var(--color-facebook);
+        }
 
-.btn-formula {
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    border-radius: 18px;
-}
+        .btn-zalo {
+            background-color: var(--color-zalo);
+        }
+
+        .btn-tiktok {
+            background-color: var(--color-tiktok);
+        }
+
+        .btn-email {
+            background-color: var(--color-email);
+        }
+
+        .btn-website {
+            background-color: var(--color-website);
+        }
+
+        .btn-g1 {
+            background-color: var(--color-g1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .btn-orange {
+            background-color: var(--color-google);
+            margin-top: 8px;
+            border-radius: 50px;
+        }
+
+        .btn-ai {
+            background: var(--color-ai);
+            border-radius: 50px;
+            margin-top: 5px;
+        }
+
+        .btn-salary {
+            background: linear-gradient(135deg, #06b6d4, #2563eb);
+            border-radius: 18px;
+        }
+
+        .btn-formula {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            border-radius: 18px;
+        }
+
+        .btn-money {
+            background: linear-gradient(135deg, #22c55e, #0ea5e9);
+            border-radius: 18px;
+        }
 
         .footer-info {
             margin-top: 30px;
@@ -196,8 +235,15 @@
         }
 
         @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
 
         .modal-header {
@@ -222,83 +268,135 @@
             align-items: center;
             justify-content: center;
         }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 32px 20px;
+                border-radius: 24px;
+            }
+
+            .info-section h1 {
+                font-size: 23px;
+            }
+
+            .btn {
+                font-size: 13.5px;
+                padding: 13px;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-<div class="card">
-    <div class="avatar-container">
-        <img src="https://github.com/bachttcn/Trang-web-c-a-B-ch/blob/main/Bach.png?raw=true" alt="Trịnh Toàn Bách" class="avatar" onerror="this.src='https://ui-avatars.com/api/?name=Toan+Bach&background=764ba2&color=fff'">
-    </div>
+    <div class="card">
+        <div class="avatar-container">
+            <img 
+                src="https://github.com/bachttcn/Trang-web-c-a-B-ch/blob/main/Bach.png?raw=true" 
+                alt="Trịnh Toàn Bách" 
+                class="avatar" 
+                onerror="this.src='https://ui-avatars.com/api/?name=Toan+Bach&background=764ba2&color=fff'">
+        </div>
 
-    <div class="info-section">
-        <h1>TRỊNH TOÀN BÁCH</h1>
-        <h2>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h2>
-        <div class="tags">
-            <span class="tag-item">💻 Web Designer</span>
-            <span class="tag-item">🎬 Content Creator</span>
-            <span class="tag-item">🚀 Yêu công nghệ</span>
+        <div class="info-section">
+            <h1>TRỊNH TOÀN BÁCH</h1>
+            <h2>Giáo viên Trung tâm GDNN - GDTX Cầu Ngang</h2>
+
+            <div class="tags">
+                <span class="tag-item">💻 Web Designer</span>
+                <span class="tag-item">🎬 Content Creator</span>
+                <span class="tag-item">🚀 Yêu công nghệ</span>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank" rel="noopener">
+                Kết bạn Facebook
+            </a>
+
+            <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank" rel="noopener">
+                Kết bạn Zalo
+            </a>
+
+            <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank" rel="noopener">
+                Kênh TikTok
+            </a>
+
+            <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank" rel="noopener">
+                Gửi Email cho tôi
+            </a>
+
+            <a href="https://gemini.google.com" class="btn btn-ai" target="_blank" rel="noopener">
+                ✨ Trợ lý AI Thông minh (Gemini)
+            </a>
+
+            <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank" rel="noopener">
+                Website Cơ Quan
+            </a>
+
+            <button id="openTool" class="btn btn-orange">
+                🔥 Mở Tool Google One
+            </button>
+
+            <a href="https://toanbach.vercel.app/tooldoitoken-bach.html" class="btn btn-g1" target="_blank" rel="noopener">
+                tooldoitoken-BACH: CHUYỂN GÓI G1
+            </a>
+
+            <a href="https://toanbach.vercel.app/tinh_luong_giao_vien.html" class="btn btn-salary" target="_blank" rel="noopener">
+                🧮 Lương Giáo viên mới theo NĐ 182/2026/NĐ-CP
+            </a>
+
+            <a href="https://toanbach.vercel.app/CONG_THUC_TINH_LUONG.html" class="btn btn-formula" target="_blank" rel="noopener">
+                📘 Công thức tính lương giáo viên
+            </a>
+
+            <a href="https://toanbach.vercel.app/tinh_luong.html" class="btn btn-salary" target="_blank" rel="noopener">
+                🧮 Tính Lương Giáo viên
+            </a>
+
+            <a href="https://toanbach.vercel.app/tien_te.html" class="btn btn-money" target="_blank" rel="noopener">
+                💱 Đổi tiền TWD ↔ VND
+            </a>
+        </div>
+
+        <div class="footer-info">
+            <p><strong>MBBank:</strong> 0945814468</p>
+            <p><strong>AgriBank:</strong> 0945814468</p>
+            <p><strong>Chủ TK:</strong> TRỊNH TOÀN BÁCH</p>
         </div>
     </div>
 
-    <div class="button-group">
-        <a href="https://www.facebook.com/tbachtv3000" class="btn btn-facebook" target="_blank">Kết bạn Facebook</a>
-        <a href="https://zalo.me/84945814468" class="btn btn-zalo" target="_blank">Kết bạn Zalo</a>
-        <a href="https://www.tiktok.com/@trinhtoanbach" class="btn btn-tiktok" target="_blank">Kênh TikTok</a>
-        <a href="mailto:tbachtv3000@gmail.com" class="btn btn-email" target="_blank">Gửi Email cho tôi</a>
-        
-        <!-- THAY ĐỔI: Nút AI giờ đây là liên kết trực tiếp đến Google Gemini -->
-        <a href="https://gemini.google.com" class="btn btn-ai" target="_blank">
-            ✨ Trợ lý AI Thông minh (Gemini)
-        </a>
+    <!-- POPUP TOOL GOOGLE ONE -->
+    <div id="toolPopup" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Hệ thống Tool Google One</span>
+                <button id="closeTool" class="close-btn">&times;</button>
+            </div>
 
-        <a href="https://www.facebook.com/trungtamgdnngdtxcaungang" class="btn btn-website" target="_blank">Website Cơ Quan</a>
-        
-        <button id="openTool" class="btn btn-orange">
-            🔥 Mở Tool Google One
-        </button>
-        <a href="https://toanbach.vercel.app/tooldoitoken-bach.html" class="btn btn-g1" target="_blank">
-            tooldoitoken-BACH: CHUYỂN GÓI G1
-        </a>
-      <a href="https://toanbach.vercel.app/tinh_luong_giao_vien.html" class="btn btn-salary" target="_blank">
-    🧮 Lương Giáo viên mới theo NĐ 182/2026/NĐ-CP
-</a>
-<a href="https://toanbach.vercel.app/CONG_THUC_TINH_LUONG.html" class="btn btn-formula" target="_blank">
-    📘 Công thức tính lương giáo viên
-</a>
-<a href="https://toanbach.vercel.app/tinh_luong.html" class="btn btn-salary" target="_blank">
-    🧮 Tinh Lương Giáo viên
-</a> 
-    </div>
-
-    <div class="footer-info">
-        <p><strong>MBBank:</strong> 0945814468</p>
-        <p><strong>AgriBank:</strong> 0945814468</p>
-        <p><strong>Chủ TK:</strong> TRỊNH TOÀN BÁCH</p>
-    </div>
-</div>
-
-<!-- POPUP TOOL GOOGLE ONE (GIỮ NGUYÊN) -->
-<div id="toolPopup" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <span>Hệ thống Tool Google One</span>
-            <button id="closeTool" class="close-btn">&times;</button>
+            <iframe src="tool.html" style="flex:1; border:none;"></iframe>
         </div>
-        <iframe src="tool.html" style="flex:1; border:none;"></iframe>
     </div>
-</div>
 
-<script>
-    const toolPopup = document.getElementById("toolPopup");
+    <script>
+        const toolPopup = document.getElementById("toolPopup");
+        const openTool = document.getElementById("openTool");
+        const closeTool = document.getElementById("closeTool");
 
-    document.getElementById("openTool").onclick = () => { toolPopup.style.display = "flex"; };
-    document.getElementById("closeTool").onclick = () => { toolPopup.style.display = "none"; };
+        openTool.onclick = () => {
+            toolPopup.style.display = "flex";
+        };
 
-    window.onclick = (e) => {
-        if(e.target === toolPopup) toolPopup.style.display = "none";
-    };
-</script>
+        closeTool.onclick = () => {
+            toolPopup.style.display = "none";
+        };
+
+        window.onclick = (e) => {
+            if (e.target === toolPopup) {
+                toolPopup.style.display = "none";
+            }
+        };
+    </script>
 
 </body>
 </html>
