@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Currency Converter - Premium Edition</title>
+    <title>Công cụ chuyển đổi tiền tệ</title>
     <style>
         body {
             background-color: #0e2f17; /* Màu xanh lục đặc trưng */
@@ -175,6 +175,22 @@
             background-color: #f8fafc;
             color: #000000;
         }
+        .option-item.selected {
+            border: 1.5px solid #9ca3af;
+            border-radius: 12px;
+            margin: 4px 8px;
+            padding: 10px 14px;
+            background: #ffffff;
+            color: #000000;
+        }
+        .option-item .currency-text {
+            flex: 1;
+        }
+        .check-mark {
+            color: #0e2f17;
+            font-weight: 800;
+            font-size: 18px;
+        }
         
         .swap-wrapper {
             display: flex;
@@ -215,12 +231,12 @@
 
 <div class="wise-container">
     <div class="rate-info">
-        <div class="rate-title">Live Exchange Rate ⓘ</div>
+        <div class="rate-title">Tỷ giá chuyển đổi thực ⓘ</div>
         <div class="rate-value" id="lblLiveRate">1 USD = 26.300 VND</div>
     </div>
     
     <div class="form-group">
-        <label>You send</label>
+        <label>Số tiền</label>
         <div class="input-box">
             <input type="text" id="fromAmount" class="amount-input" value="1" inputmode="decimal" oninput="xuLyGoPhim(this, true)">
             
@@ -230,7 +246,7 @@
                 </div>
                 <div class="dropdown-menu" id="menu-from">
                     <div class="search-box-wrapper">
-                        <input type="text" class="search-input" placeholder="Type currency code or country..." oninput="filterCurrencies('from')">
+                        <input type="text" class="search-input" placeholder="Tìm kiếm tiền tệ hoặc quốc gia..." oninput="filterCurrencies('from')">
                     </div>
                     <div class="options-list" id="list-from"></div>
                 </div>
@@ -243,7 +259,7 @@
     </div>
 
     <div class="form-group" style="margin-top: 4px;">
-        <label>Recipient gets</label>
+        <label>Chuyển đổi thành</label>
         <div class="input-box">
             <input type="text" id="toAmount" class="amount-input" value="26300" inputmode="decimal" oninput="xuLyGoPhim(this, false)">
             
@@ -253,7 +269,7 @@
                 </div>
                 <div class="dropdown-menu" id="menu-to">
                     <div class="search-box-wrapper">
-                        <input type="text" class="search-input" placeholder="Type currency code or country..." oninput="filterCurrencies('to')">
+                        <input type="text" class="search-input" placeholder="Tìm kiếm tiền tệ hoặc quốc gia..." oninput="filterCurrencies('to')">
                     </div>
                     <div class="options-list" id="list-to"></div>
                 </div>
@@ -261,60 +277,184 @@
         </div>
     </div>
 
-    <div class="update-time" id="lblTime">Smart Offline Mode Ready</div>
+    <div class="update-time" id="lblTime">Sẵn sàng chuyển đổi ngoại tuyến</div>
 </div>
 
 <script>
     // Đã lọc sạch toàn bộ ký tự Latin lạ để tránh lỗi Encoding hệ thống (ANSI) gây chết script
+    // Tên tiền tệ đã Việt hóa để hiển thị trong danh sách giống Wise
     const currencyNames = {
-        "USD": "United States Dollar", "EUR": "Euro", "JPY": "Japanese Yen", "GBP": "British Pound Sterling",
-        "AUD": "Australian Dollar", "CAD": "Canadian Dollar", "CHF": "Swiss Franc", "CNY": "Chinese Yuan",
-        "HKD": "Hong Kong Dollar", "NZD": "New Zealand Dollar", "SEK": "Swedish Krona", "KRW": "South Korean Won",
-        "SGD": "Singapore Dollar", "NOK": "Norwegian Krone", "MXN": "Mexican Peso", "INR": "Indian Rupee",
-        "RUB": "Russian Ruble", "ZAR": "South African Rand", "TRY": "Turkish Lira", "BRL": "Brazilian Real",
-        "TWD": "New Taiwan Dollar", "VND": "Vietnamese Dong", "THB": "Thai Baht", "IDR": "Indonesian Rupiah",
-        "MYR": "Malaysian Ringgit", "PHP": "Philippine Peso", "AED": "United Arab Emirates Dirham", "AFN": "Afghan Afghani",
-        "ALL": "Albanian Lek", "AMD": "Armenian Dram", "ANG": "Netherlands Antillean Guilder", "AOA": "Angolan Kwanza",
-        "ARS": "Argentine Peso", "AWG": "Aruban Florin", "AZN": "Azerbaijani Manat", "BAM": "Bosnia-Herzegovina Mark",
-        "BBD": "Barbadian Dollar", "BDT": "Bangladeshi Taka", "BGN": "Bulgarian Lev", "BHD": "Bahraini Dinar",
-        "BIF": "Burundian Franc", "BMD": "Bermudan Dollar", "BND": "Brunei Dollar", "BOB": "Bolivian Boliviano",
-        "BSD": "Bahamian Dollar", "BTN": "Bhutanese Ngultrum", "BWP": "Botswanan Pula", "BYN": "Belarusian Ruble",
-        "BZD": "Belize Dollar", "CDF": "Congolese Franc", "CLP": "Chilean Peso", "COP": "Colombian Peso",
-        "CRC": "Costa Rican Colon", "CUP": "Cuban Peso", "CVE": "Cape Verdean Escudo", "CZK": "Czech Koruna",
-        "DJF": "Djiboutian Franc", "DKK": "Danish Krone", "DOP": "Dominican Peso", "DZD": "Algerian Dinar",
-        "EGP": "Egyptian Pound", "ERN": "Eritrean Nakfa", "ETB": "Ethiopian Birr", "FJD": "Fijian Dollar",
-        "FKP": "Falkland Islands Pound", "FOK": "Faroe Islands Krona", "GEL": "Georgian Lari", "GGP": "Guernsey Pound",
-        "GHS": "Ghanaian Cedi", "GIP": "Gibraltar Pound", "GMD": "Gambian Dalasi", "GNF": "Guinean Franc",
-        "GTQ": "Guatemalan Quetzal", "GYD": "Guyanese Dollar", "HNL": "Honduran Lempira", "HRK": "Croatian Kuna",
-        "HTG": "Haitian Gourde", "HUF": "Hungarian Forint", "ILS": "Israeli New Shekel", "IMP": "Manx Pound",
-        "IQD": "Iraqi Dinar", "IRR": "Iranian Rial", "ISK": "Icelandic Krona", "JEP": "Jersey Pound",
-        "JMD": "Jamaican Dollar", "JOD": "Jordanian Dinar", "KES": "Kenyan Shilling", "KGS": "Kyrgystani Som",
-        "KHR": "Cambodian Riel", "KID": "Kiribati Dollar", "KMF": "Comorian Franc", "KPW": "North Korean Won",
-        "KWD": "Kuwaiti Dinar", "KYD": "Cayman Islands Dollar", "KZT": "Kazakhstani Tenge", "LAK": "Laotian Kip",
-        "LBP": "Lebanese Pound", "LKR": "Sri Lankan Rupee", "LRD": "Liberian Dollar", "LSL": "Lesotho Loti",
-        "LYD": "Libyan Dinar", "MAD": "Moroccan Dirham", "MDL": "Moldovan Leu", "MGA": "Malagasy Ariary",
-        "MKD": "Macedonian Denar", "MMK": "Myanmar Kyat", "MNT": "Mongolian Tugrik", "MOP": "Macanese Pataca",
-        "MRU": "Mauritanian Ouguiya", "MUR": "Mauritian Rupee", "MVR": "Maldivian Rufiyaah", "MWK": "Malawian Kwacha",
-        "MZN": "Mozambican Metical", "NAD": "Namibian Dollar", "NGN": "Nigerian Naira", "NIO": "Nicaraguan Cordoba",
-        "NPR": "Nepalese Rupee", "OMR": "Oman Rial", "PAB": "Panamanian Balboa", "PEN": "Peruvian Sol",
-        "PGK": "Papua New Guinean Kina", "PKR": "Pakistan Rupee", "PLN": "Polish Zloty", "PYG": "Paraguayan Guarani",
-        "QAR": "Qatari Rial", "RON": "Romanian Leu", "RSD": "Serbian Dinar", "RWF": "Rwanda Franc",
-        "SAR": "Saudi Riyal", "SBD": "Solomon Islands Dollar", "SCR": "Seychellois Rupee", "SDG": "Sudanese Pound",
-        "SHP": "Saint Helena Pound", "SLE": "Sierra Leonean Leone", "SLL": "Sierra Leonean Leone", "SOS": "Somali Shilling",
-        "SRD": "Surinamese Dollar", "SSP": "South Sudanese Pound", "STN": "Sao Tome and Principe Dobra", "SYP": "Syrian Pound",
-        "SZL": "Eswatini Lilangeni", "TJS": "Tajikistani Somoni", "TMT": "Turkmenistan Manat", "TND": "Tunisian Dinar",
-        "TOP": "Tongan Paanga", "TVD": "Tuvaluan Dollar", "TZS": "Tanzanian Shilling", "UAH": "Ukrainian Hryvnia",
-        "UGX": "Ugandian Shilling", "UYU": "Uruguayan Peso", "UZS": "Uzbekistani Som", "VES": "Venezuelan Bolivar",
-        "VUV": "Vanuatu Vatu", "WST": "Samoan Tala", "XAF": "Central African CFA Franc", "XCD": "East Caribbean Dollar",
-        "XDR": "Special Drawing Rights", "XOF": "West African CFA Franc", "XPF": "CFP Franc",
-        "YER": "Yemeni Rial", "ZMW": "Zambian Kwacha", "ZWG": "Zimbabwe Gold", "ZWL": "Zimbabwean Dollar"
+        "EUR": "Euro",
+        "GBP": "Bảng Anh",
+        "USD": "Đô-la Mỹ",
+        "INR": "Rupee Ấn Độ",
+        "CAD": "Đô-la Canada",
+        "AUD": "Đô-la Úc",
+        "JPY": "Yên Nhật",
+        "VND": "Đồng Việt Nam",
+        "TWD": "Đô-la Đài Loan mới",
+        "CNY": "Nhân dân tệ Trung Quốc",
+        "KRW": "Won Hàn Quốc",
+        "SGD": "Đô-la Singapore",
+        "THB": "Baht Thái Lan",
+        "MYR": "Ringgit Malaysia",
+        "PHP": "Peso Philippines",
+        "IDR": "Rupiah Indonesia",
+        "HKD": "Đô-la Hồng Kông",
+        "NZD": "Đô-la New Zealand",
+        "CHF": "Franc Thụy Sĩ",
+        "SEK": "Krona Thụy Điển",
+        "NOK": "Krone Na Uy",
+        "MXN": "Peso Mexico",
+        "RUB": "Rúp Nga",
+        "ZAR": "Rand Nam Phi",
+        "TRY": "Lira Thổ Nhĩ Kỳ",
+        "BRL": "Real Brazil",
+        "AED": "Dirham Các Tiểu vương quốc Ả Rập Thống nhất",
+        "AFN": "Afghani Afghanistan",
+        "ALL": "Lek Albania",
+        "AMD": "Dram Armenia",
+        "ANG": "Guilder Antille Hà Lan",
+        "AOA": "Kwanza Angola",
+        "ARS": "Peso Argentina",
+        "AWG": "Florin Aruba",
+        "AZN": "Manat Azerbaijan",
+        "BAM": "Mark Bosnia-Herzegovina",
+        "BBD": "Đô-la Barbados",
+        "BDT": "Taka Bangladesh",
+        "BGN": "Lev Bulgaria",
+        "BHD": "Dinar Bahrain",
+        "BIF": "Franc Burundi",
+        "BMD": "Đô-la Bermuda",
+        "BND": "Đô-la Brunei",
+        "BOB": "Boliviano Bolivia",
+        "BSD": "Đô-la Bahamas",
+        "BTN": "Ngultrum Bhutan",
+        "BWP": "Pula Botswana",
+        "BYN": "Rúp Belarus",
+        "BZD": "Đô-la Belize",
+        "CDF": "Franc Congo",
+        "CLP": "Peso Chile",
+        "COP": "Peso Colombia",
+        "CRC": "Colon Costa Rica",
+        "CUP": "Peso Cuba",
+        "CVE": "Escudo Cabo Verde",
+        "CZK": "Koruna Séc",
+        "DJF": "Franc Djibouti",
+        "DKK": "Krone Đan Mạch",
+        "DOP": "Peso Dominica",
+        "DZD": "Dinar Algeria",
+        "EGP": "Bảng Ai Cập",
+        "ERN": "Nakfa Eritrea",
+        "ETB": "Birr Ethiopia",
+        "FJD": "Đô-la Fiji",
+        "FKP": "Bảng Quần đảo Falkland",
+        "FOK": "Krona Quần đảo Faroe",
+        "GEL": "Lari Georgia",
+        "GGP": "Bảng Guernsey",
+        "GHS": "Cedi Ghana",
+        "GIP": "Bảng Gibraltar",
+        "GMD": "Dalasi Gambia",
+        "GNF": "Franc Guinea",
+        "GTQ": "Quetzal Guatemala",
+        "GYD": "Đô-la Guyana",
+        "HNL": "Lempira Honduras",
+        "HRK": "Kuna Croatia",
+        "HTG": "Gourde Haiti",
+        "HUF": "Forint Hungary",
+        "ILS": "Shekel Israel mới",
+        "IMP": "Bảng Isle of Man",
+        "IQD": "Dinar Iraq",
+        "IRR": "Rial Iran",
+        "ISK": "Krona Iceland",
+        "JEP": "Bảng Jersey",
+        "JMD": "Đô-la Jamaica",
+        "JOD": "Dinar Jordan",
+        "KES": "Shilling Kenya",
+        "KGS": "Som Kyrgyzstan",
+        "KHR": "Riel Campuchia",
+        "KID": "Đô-la Kiribati",
+        "KMF": "Franc Comoros",
+        "KPW": "Won Triều Tiên",
+        "KWD": "Dinar Kuwait",
+        "KYD": "Đô-la Quần đảo Cayman",
+        "KZT": "Tenge Kazakhstan",
+        "LAK": "Kip Lào",
+        "LBP": "Bảng Lebanon",
+        "LKR": "Rupee Sri Lanka",
+        "LRD": "Đô-la Liberia",
+        "LSL": "Loti Lesotho",
+        "LYD": "Dinar Libya",
+        "MAD": "Dirham Maroc",
+        "MDL": "Leu Moldova",
+        "MGA": "Ariary Madagascar",
+        "MKD": "Denar Macedonia",
+        "MMK": "Kyat Myanmar",
+        "MNT": "Tugrik Mông Cổ",
+        "MOP": "Pataca Macau",
+        "MRU": "Ouguiya Mauritania",
+        "MUR": "Rupee Mauritius",
+        "MVR": "Rufiyaa Maldives",
+        "MWK": "Kwacha Malawi",
+        "MZN": "Metical Mozambique",
+        "NAD": "Đô-la Namibia",
+        "NGN": "Naira Nigeria",
+        "NIO": "Cordoba Nicaragua",
+        "NPR": "Rupee Nepal",
+        "OMR": "Rial Oman",
+        "PAB": "Balboa Panama",
+        "PEN": "Sol Peru",
+        "PGK": "Kina Papua New Guinea",
+        "PKR": "Rupee Pakistan",
+        "PLN": "Zloty Ba Lan",
+        "PYG": "Guarani Paraguay",
+        "QAR": "Riyal Qatar",
+        "RON": "Leu Romania",
+        "RSD": "Dinar Serbia",
+        "RWF": "Franc Rwanda",
+        "SAR": "Riyal Saudi Arabia",
+        "SBD": "Đô-la Quần đảo Solomon",
+        "SCR": "Rupee Seychelles",
+        "SDG": "Bảng Sudan",
+        "SHP": "Bảng Saint Helena",
+        "SLE": "Leone Sierra Leone",
+        "SLL": "Leone Sierra Leone cũ",
+        "SOS": "Shilling Somalia",
+        "SRD": "Đô-la Suriname",
+        "SSP": "Bảng Nam Sudan",
+        "STN": "Dobra Sao Tome và Principe",
+        "SYP": "Bảng Syria",
+        "SZL": "Lilangeni Eswatini",
+        "TJS": "Somoni Tajikistan",
+        "TMT": "Manat Turkmenistan",
+        "TND": "Dinar Tunisia",
+        "TOP": "Paanga Tonga",
+        "TVD": "Đô-la Tuvalu",
+        "TZS": "Shilling Tanzania",
+        "UAH": "Hryvnia Ukraine",
+        "UGX": "Shilling Uganda",
+        "UYU": "Peso Uruguay",
+        "UZS": "Som Uzbekistan",
+        "VES": "Bolivar Venezuela",
+        "VUV": "Vatu Vanuatu",
+        "WST": "Tala Samoa",
+        "XAF": "Franc CFA Trung Phi",
+        "XCD": "Đô-la Đông Caribe",
+        "XDR": "Quyền rút vốn đặc biệt",
+        "XOF": "Franc CFA Tây Phi",
+        "XPF": "Franc CFP",
+        "YER": "Rial Yemen",
+        "ZMW": "Kwacha Zambia",
+        "ZWG": "Zimbabwe Gold",
+        "ZWL": "Đô-la Zimbabwe"
     };
 
     let selectedFrom = "USD";
     let selectedTo = "VND";
+    const popularCurrencyOrder = ["EUR", "GBP", "USD", "INR", "CAD", "AUD", "JPY", "VND", "TWD", "CNY", "KRW", "SGD", "THB"];
     let allCurrencyCodes = Object.keys(currencyNames);
     
-    // Core Offline Data: Cơ sở dữ liệu tỷ giá dự phòng (gốc USD = 1) giúp chạy mượt ngay cả khi không có mạng
+    // Cơ sở dữ liệu tỷ giá dự phòng (gốc USD = 1) giúp chạy mượt ngay cả khi không có mạng
     const offlineRatesToUSD = {
         "USD": 1, "EUR": 0.93, "TWD": 32.5, "VND": 26300, "JPY": 156, "GBP": 0.79, 
         "AUD": 1.51, "CAD": 1.37, "CHF": 0.90, "CNY": 7.25, "HKD": 7.81, "SGD": 1.35, 
@@ -426,27 +566,54 @@
         return dinhDangDauCham(Number(rate.toFixed(soLe)));
     }
 
+    function boDauTiengViet(str) {
+        return str.toString()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/đ/g, "d")
+            .replace(/Đ/g, "D")
+            .toLowerCase();
+    }
+
+    function sapXepTienTe(codes) {
+        const thuTuUuTien = new Map(popularCurrencyOrder.map((code, index) => [code, index]));
+        return [...codes].sort((a, b) => {
+            const aIndex = thuTuUuTien.has(a) ? thuTuUuTien.get(a) : 999;
+            const bIndex = thuTuUuTien.has(b) ? thuTuUuTien.get(b) : 999;
+            if (aIndex !== bIndex) return aIndex - bIndex;
+            return a.localeCompare(b);
+        });
+    }
+
     function renderList(type, filterText = "") {
         const listContainer = document.getElementById(`list-${type}`);
         if(!listContainer) return;
         listContainer.innerHTML = "";
-        const searchKey = filterText.toLowerCase().trim();
+        const searchKey = boDauTiengViet(filterText.trim());
+        const selectedCode = type === "from" ? selectedFrom : selectedTo;
 
-        allCurrencyCodes.forEach(code => {
-            const countryName = currencyNames[code] || "Global Currency";
+        sapXepTienTe(allCurrencyCodes).forEach(code => {
+            const countryName = currencyNames[code] || "Tiền tệ quốc tế";
             const flagUrl = layUrlCo(code);
-            const fullTextToSearch = (code + " " + countryName).toLowerCase();
+            const fullTextToSearch = boDauTiengViet(code + " " + countryName);
             
             if (fullTextToSearch.includes(searchKey)) {
                 const item = document.createElement('div');
-                item.className = "option-item";
-                item.innerHTML = `<img src="${flagUrl}" class="flag-icon" onerror="this.onerror=null; this.style.visibility='hidden';"> <span><strong>${code}</strong> - ${countryName}</span>`;
+                item.className = "option-item" + (code === selectedCode ? " selected" : "");
+                item.innerHTML = `<img src="${flagUrl}" class="flag-icon" onerror="this.onerror=null; this.style.visibility='hidden';"> <span class="currency-text"><strong>${code}</strong> ${countryName}</span>${code === selectedCode ? '<span class="check-mark">✓</span>' : ''}`;
                 item.onclick = function() {
                     selectCurrency(type, code);
                 };
                 listContainer.appendChild(item);
             }
         });
+
+        if (listContainer.innerHTML === "") {
+            const empty = document.createElement('div');
+            empty.className = "option-item";
+            empty.innerHTML = "Không tìm thấy tiền tệ phù hợp";
+            listContainer.appendChild(empty);
+        }
     }
 
     function toggleDropdown(e, type) {
@@ -499,14 +666,14 @@
                 });
 
                 const thoiGian = new Date(data.time_last_update_unix * 1000).toLocaleString('vi-VN');
-                document.getElementById('lblTime').innerText = `Live update: ${thoiGian}`;
+                document.getElementById('lblTime').innerText = `Cập nhật trực tiếp: ${thoiGian}`;
                 tinhToanChuyenDoi(true);
             } else {
                 throw new Error("API error status");
             }
         } catch (error) {
             // Khắc phục lỗi treo: Nếu dính CORS hoặc mất mạng, chuyển chế độ Local mượt mà
-            document.getElementById('lblTime').innerText = "Smart Offline Mode (Local Rates)";
+            document.getElementById('lblTime').innerText = "Chế độ ngoại tuyến thông minh (tỷ giá dự phòng)";
             tinhToanChuyenDoi(true);
         }
     }
