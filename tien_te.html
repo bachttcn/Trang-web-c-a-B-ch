@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -216,17 +216,17 @@
 <div class="wise-container">
     <div class="rate-info">
         <div class="rate-title">Live Exchange Rate ⓘ</div>
-        <div class="rate-value" id="lblLiveRate">1 TWD = 831,58 VND</div>
+        <div class="rate-value" id="lblLiveRate">1 USD = 26.300 VND</div>
     </div>
     
     <div class="form-group">
         <label>You send</label>
         <div class="input-box">
-            <input type="text" id="fromAmount" class="amount-input" value="1000" oninput="xuLyGoPhim(this, true)">
+            <input type="text" id="fromAmount" class="amount-input" value="1" inputmode="decimal" oninput="xuLyGoPhim(this, true)">
             
             <div class="custom-select-wrapper" id="wrapper-from">
                 <div class="select-trigger" id="trigger-from" onclick="toggleDropdown(event, 'from')">
-                    <img src="https://flagcdn.com/w40/tw.png" class="flag-icon"> TWD
+                    <img src="https://flagcdn.com/w40/us.png" class="flag-icon"> USD
                 </div>
                 <div class="dropdown-menu" id="menu-from">
                     <div class="search-box-wrapper">
@@ -245,7 +245,7 @@
     <div class="form-group" style="margin-top: 4px;">
         <label>Recipient gets</label>
         <div class="input-box">
-            <input type="text" id="toAmount" class="amount-input" value="831580" oninput="xuLyGoPhim(this, false)">
+            <input type="text" id="toAmount" class="amount-input" value="26300" inputmode="decimal" oninput="xuLyGoPhim(this, false)">
             
             <div class="custom-select-wrapper" id="wrapper-to">
                 <div class="select-trigger" id="trigger-to" onclick="toggleDropdown(event, 'to')">
@@ -310,13 +310,13 @@
         "YER": "Yemeni Rial", "ZMW": "Zambian Kwacha", "ZWG": "Zimbabwe Gold", "ZWL": "Zimbabwean Dollar"
     };
 
-    let selectedFrom = "TWD";
+    let selectedFrom = "USD";
     let selectedTo = "VND";
     let allCurrencyCodes = Object.keys(currencyNames);
     
     // Core Offline Data: Cơ sở dữ liệu tỷ giá dự phòng (gốc USD = 1) giúp chạy mượt ngay cả khi không có mạng
     const offlineRatesToUSD = {
-        "USD": 1, "EUR": 0.93, "TWD": 32.5, "VND": 25400, "JPY": 156, "GBP": 0.79, 
+        "USD": 1, "EUR": 0.93, "TWD": 32.5, "VND": 26300, "JPY": 156, "GBP": 0.79, 
         "AUD": 1.51, "CAD": 1.37, "CHF": 0.90, "CNY": 7.25, "HKD": 7.81, "SGD": 1.35, 
         "THB": 36.7, "KRW": 1375, "MYR": 4.71, "IDR": 16200, "PHP": 58.5, "INR": 83.5
     };
@@ -367,31 +367,63 @@
         return phan.join(",");
     }
 
+    // Cho phép nhập số kiểu Việt Nam: 1,2  |  12,5  |  1.234,56
+    function chuanHoaSoNhap(str) {
+        if (!str) return "";
+        let raw = str.toString().replace(/[^0-9,\.]/g, "");
+
+        // Dấu chấm chỉ dùng để phân cách hàng nghìn, dấu phẩy là phần thập phân
+        raw = raw.replace(/\./g, "");
+
+        const coDauPhay = raw.includes(",");
+        const phan = raw.split(",");
+        let phanNguyen = (phan[0] || "").replace(/\D/g, "");
+        let phanThapPhan = phan.slice(1).join("").replace(/\D/g, "");
+
+        if (!phanNguyen && !coDauPhay) return "";
+        if (!phanNguyen) phanNguyen = "0";
+
+        // Bỏ số 0 dư ở đầu, nhưng vẫn giữ 0 khi nhập 0,5
+        phanNguyen = phanNguyen.replace(/^0+(?=\d)/, "");
+        phanNguyen = phanNguyen.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+
+        return coDauPhay ? phanNguyen + "," + phanThapPhan : phanNguyen;
+    }
+
     function chuyenThanhSoThuanTuy(str) {
         if(!str) return 0;
-        return parseFloat(str.replace(/\./g, "").replace(/,/g, ".")) || 0;
+        return parseFloat(str.toString().replace(/\./g, "").replace(/,/g, ".")) || 0;
     }
 
     function xuLyGoPhim(inputEl, isFromInput) {
-        let viTriChuot = inputEl.selectionStart;
-        let chieuDaiCu = inputEl.value.length;
-
-        let soThuanTuy = inputEl.value.replace(/\./g, "").replace(/[^0-9]/g, "");
-        if (!soThuanTuy) {
-            inputEl.value = "";
-            tinhToanChuyenDoi(isFromInput);
-            return;
-        }
-
-        let giaTriSo = parseInt(soThuanTuy, 10);
-        let chuoiDinhDangMoi = dinhDangDauCham(giaTriSo);
+        const chuoiDinhDangMoi = chuanHoaSoNhap(inputEl.value);
         inputEl.value = chuoiDinhDangMoi;
 
-        let chieuDaiMoi = chuoiDinhDangMoi.length;
-        let viTriMoi = viTriChuot + (chieuDaiMoi - chieuDaiCu);
-        inputEl.setSelectionRange(viTriMoi, viTriMoi);
+        // Đưa con trỏ về cuối để tránh lỗi nhảy chữ khi có dấu chấm hàng nghìn hoặc dấu phẩy thập phân
+        const viTriCuoi = inputEl.value.length;
+        if (inputEl.setSelectionRange) inputEl.setSelectionRange(viTriCuoi, viTriCuoi);
 
         tinhToanChuyenDoi(isFromInput);
+    }
+
+    function tienKhongCoSoLe(maTien) {
+        return ["VND", "JPY", "KRW", "IDR", "CLP", "PYG", "UGX", "VUV", "XAF", "XOF", "XPF"].includes(maTien);
+    }
+
+    function dinhDangKetQua(num, maTien) {
+        if (!isFinite(num)) return "0";
+        if (tienKhongCoSoLe(maTien)) {
+            return dinhDangDauCham(Math.round(num));
+        }
+        return dinhDangDauCham(Number(num.toFixed(2)));
+    }
+
+    function dinhDangTyGia(rate) {
+        if (!isFinite(rate)) return "0";
+        let soLe = 2;
+        if (rate < 1) soLe = 6;
+        else if (rate < 100) soLe = 4;
+        return dinhDangDauCham(Number(rate.toFixed(soLe)));
     }
 
     function renderList(type, filterText = "") {
@@ -484,14 +516,14 @@
         
         if (isFromInput) {
             const inputVal = chuyenThanhSoThuanTuy(document.getElementById('fromAmount').value);
-            document.getElementById('toAmount').value = dinhDangDauCham(Math.round(inputVal * rate));
+            document.getElementById('toAmount').value = dinhDangKetQua(inputVal * rate, selectedTo);
         } else {
             const outputVal = chuyenThanhSoThuanTuy(document.getElementById('toAmount').value);
-            document.getElementById('fromAmount').value = rate > 0 ? dinhDangDauCham(Math.round(outputVal / rate)) : "0";
+            document.getElementById('fromAmount').value = rate > 0 ? dinhDangKetQua(outputVal / rate, selectedFrom) : "0";
         }
 
         // Luôn cập nhật thông số tỷ giá hiển thị ở đầu khung
-        document.getElementById('lblLiveRate').innerText = `1 ${selectedFrom} = ${dinhDangDauCham(Math.round(rate * 100) / 100)} ${selectedTo}`;
+        document.getElementById('lblLiveRate').innerText = `1 ${selectedFrom} = ${dinhDangTyGia(rate)} ${selectedTo}`;
     }
 
     function daoNguocTienTe() {
