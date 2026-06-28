@@ -1,0 +1,13 @@
+{
+  "name": "toanbach-link-shortener",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Ung dung rut gon lien ket chay tren Vercel + Upstash Redis",
+  "dependencies": {
+    "@upstash/redis": "latest"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

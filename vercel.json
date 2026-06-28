@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/link", "destination": "/link.html" },
+    { "source": "/go", "destination": "/link.html" },
+    { "source": "/bach", "destination": "/link.html" },
+    { "source": "/go/:code", "destination": "/api/resolve?code=:code" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
