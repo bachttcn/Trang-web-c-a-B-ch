@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rút Gọn Link da.gd - Toàn Bách</title>
+  <meta name="description" content="Ứng dụng rút gọn liên kết siêu ngắn bằng da.gd trên website Toàn Bách." />
+  <style>
+    :root { --dark:#111; --text:#0f172a; --muted:#64748b; --line:#e5e7eb; --green:#10b981; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Arial,Helvetica,sans-serif; color:var(--text); min-height:100vh; background:radial-gradient(circle at top left,rgba(59,130,246,.12),transparent 34%),radial-gradient(circle at bottom right,rgba(16,185,129,.18),transparent 30%),linear-gradient(135deg,#f8fbff 0%,#effdf7 100%); }
+    .topbar { height:92px; background:linear-gradient(135deg,#111 0%,#231b1b 100%); color:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 32px; box-shadow:0 10px 30px rgba(0,0,0,.12); }
+    .topbar h1 { margin:0; font-size:28px; letter-spacing:-.5px; }
+    .badge { border:1px solid rgba(255,255,255,.2); border-radius:999px; padding:10px 18px; background:rgba(255,255,255,.1); font-weight:700; }
+    .wrap { width:min(1120px,calc(100% - 32px)); margin:42px auto; }
+    .hero { display:flex; align-items:center; gap:18px; margin-bottom:26px; }
+    .icon { width:74px; height:74px; border-radius:22px; background:#111; color:white; display:grid; place-items:center; font-size:34px; box-shadow:0 18px 36px rgba(0,0,0,.16); flex:0 0 auto; }
+    .hero h2 { margin:0; font-size:clamp(30px,4vw,44px); line-height:1; letter-spacing:-1px; }
+    .hero p { margin:8px 0 0; color:var(--muted); font-weight:800; letter-spacing:8px; font-size:15px; }
+    .card { background:rgba(255,255,255,.92); border:1px solid rgba(226,232,240,.9); border-radius:26px; box-shadow:0 25px 70px rgba(15,23,42,.12); padding:28px; backdrop-filter:blur(12px); }
+    .form-row { display:grid; grid-template-columns:1fr 180px; gap:18px; align-items:stretch; }
+    .input-wrap { position:relative; }
+    .prefix-icon { position:absolute; left:22px; top:50%; transform:translateY(-50%); font-size:28px; opacity:.38; pointer-events:none; }
+    input { width:100%; min-height:70px; border:1px solid var(--line); border-radius:22px; outline:none; padding:0 22px 0 64px; font-size:20px; color:var(--text); background:#fff; box-shadow:inset 0 1px 3px rgba(0,0,0,.03); }
+    input:focus { border-color:#86efac; box-shadow:0 0 0 4px rgba(34,197,94,.15); }
+    #custom { margin-top:16px; padding-left:22px; font-size:18px; min-height:62px; }
+    button { border:0; border-radius:22px; font-weight:900; font-size:21px; cursor:pointer; background:#111; color:white; transition:.2s ease; min-height:70px; }
+    button:hover { transform:translateY(-2px); filter:brightness(1.05); box-shadow:0 14px 28px rgba(0,0,0,.16); }
+    button:disabled { opacity:.6; cursor:wait; transform:none; box-shadow:none; }
+    .hint { color:var(--muted); margin:18px 6px 0; font-size:17px; line-height:1.6; }
+    .hint b { color:#111; }
+    .message { display:none; margin-top:20px; padding:18px 20px; border-radius:18px; font-weight:800; font-size:18px; line-height:1.5; }
+    .message.ok { display:block; background:#ecfdf5; border:1px solid #86efac; color:#065f46; }
+    .message.err { display:block; background:#fff1f2; border:1px solid #fecdd3; color:#be123c; }
+    .result { display:none; margin-top:28px; grid-template-columns:1fr 250px; gap:26px; align-items:start; }
+    .result.show { display:grid; }
+    .short-box { border:3px solid #a7f3d0; border-radius:24px; background:#ecfdf5; padding:24px; min-height:116px; }
+    .label { color:#047857; font-size:15px; letter-spacing:4px; font-weight:900; margin-bottom:20px; }
+    .short-url { word-break:break-all; font-size:clamp(25px,4vw,38px); font-weight:900; color:#111; line-height:1.15; }
+    .actions { display:flex; gap:14px; margin-top:18px; flex-wrap:wrap; }
+    .btn-small { min-height:58px; padding:0 24px; border-radius:18px; font-size:18px; }
+    .btn-copy { background:#111; }
+    .btn-open { background:linear-gradient(135deg,#059669,#0f766e); text-decoration:none; color:#fff; min-height:58px; padding:0 24px; border-radius:18px; font-size:18px; font-weight:900; display:inline-flex; align-items:center; justify-content:center; }
+    .qr-card { background:#fff; border:1px solid var(--line); border-radius:24px; padding:20px; box-shadow:0 18px 40px rgba(15,23,42,.08); text-align:center; }
+    .qr-card img { width:100%; max-width:210px; aspect-ratio:1; object-fit:contain; }
+    .footer { text-align:center; color:var(--muted); margin:28px 0 10px; font-size:16px; }
+    .footer b { color:#111; }
+    @media (max-width:780px) { .topbar{padding:0 18px;height:78px}.topbar h1{font-size:22px}.badge{padding:8px 12px;font-size:14px}.wrap{margin:28px auto}.hero{align-items:flex-start}.icon{width:64px;height:64px;font-size:30px;border-radius:18px}.hero p{letter-spacing:5px}.card{padding:18px;border-radius:22px}.form-row{grid-template-columns:1fr}input,button{min-height:62px;font-size:17px}.result.show{display:block}.qr-card{margin-top:20px} }
+  </style>
+</head>
+<body>
+  <header class="topbar"><h1>Rút Gọn Link da.gd</h1><div class="badge">Toàn Bách</div></header>
+  <main class="wrap">
+    <section class="hero"><div class="icon">⚡</div><div><h2>Rút Gọn Siêu Ngắn</h2><p>DA.GD UTILITY</p></div></section>
+    <section class="card">
+      <div class="form-row">
+        <div class="input-wrap"><span class="prefix-icon">🔗</span><input id="longUrl" type="url" placeholder="Dán link dài vào đây, ví dụ: https://toanbach.vercel.app/" /></div>
+        <button id="shortenBtn">Rút gọn</button>
+      </div>
+      <input id="custom" type="text" placeholder="Tên tùy chỉnh nếu muốn, ví dụ: toanbach hoặc tailieu2026 (có thể bỏ trống)" />
+      <p class="hint">Link tạo ra sẽ có dạng <b>https://da.gd/abcde</b>. Nếu muốn đuôi đẹp thì điền ô tùy chỉnh, ví dụ <b>toanbach2026</b>.</p>
+      <div id="message" class="message"></div>
+      <div id="result" class="result">
+        <div>
+          <div class="short-box"><div class="label">LINK RÚT GỌN:</div><div id="shortUrl" class="short-url"></div></div>
+          <div class="actions"><button id="copyBtn" class="btn-small btn-copy">📋 Sao chép</button><a id="openBtn" class="btn-open" href="#" target="_blank" rel="noopener">↗ Mở thử</a></div>
+        </div>
+        <div class="qr-card"><img id="qrImg" alt="QR code cho link rút gọn" /><div style="margin-top:12px;color:#64748b;font-weight:700;">QR của link da.gd</div></div>
+      </div>
+    </section>
+    <div class="footer">Ứng dụng rút gọn link <b>da.gd</b> riêng trên <b>toanbach.vercel.app</b></div>
+  </main>
+  <script>
+    const longUrlInput=document.getElementById('longUrl'), customInput=document.getElementById('custom'), shortenBtn=document.getElementById('shortenBtn'), message=document.getElementById('message'), result=document.getElementById('result'), shortUrlEl=document.getElementById('shortUrl'), copyBtn=document.getElementById('copyBtn'), openBtn=document.getElementById('openBtn'), qrImg=document.getElementById('qrImg');
+    function showMessage(type,text){message.className='message '+type;message.textContent=text;}
+    function clearMessage(){message.className='message';message.textContent='';}
+    function normalizeUrl(raw){const value=raw.trim(); if(!value) return ''; return /^https?:\/\//i.test(value)?value:'https://'+value;}
+    async function shorten(){clearMessage(); result.classList.remove('show'); const url=normalizeUrl(longUrlInput.value); const custom=customInput.value.trim(); if(!url){showMessage('err','Đại ka chưa dán link cần rút gọn.');return;} if(custom&&!/^[A-Za-z0-9_-]{3,40}$/.test(custom)){showMessage('err','Tên tùy chỉnh chỉ nên dùng chữ không dấu, số, dấu gạch ngang hoặc gạch dưới; dài 3–40 ký tự.');return;} shortenBtn.disabled=true; shortenBtn.textContent='Đang tạo...'; try{const res=await fetch('/api/dagd',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,custom})}); const data=await res.json(); if(!res.ok||!data.ok) throw new Error(data.error||'Không tạo được link da.gd.'); shortUrlEl.textContent=data.shortUrl; openBtn.href=data.shortUrl; qrImg.src='https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='+encodeURIComponent(data.shortUrl); result.classList.add('show'); showMessage('ok','Tạo link da.gd thành công. Bấm Sao chép để gửi cho người khác nhé.');}catch(err){showMessage('err',err.message||'Có lỗi xảy ra khi tạo link.');}finally{shortenBtn.disabled=false; shortenBtn.textContent='Rút gọn';}}
+    async function copyShortUrl(){const text=shortUrlEl.textContent.trim(); if(!text) return; try{await navigator.clipboard.writeText(text); copyBtn.textContent='✅ Đã sao chép'; setTimeout(()=>copyBtn.textContent='📋 Sao chép',1600);}catch(err){showMessage('err','Trình duyệt không cho tự sao chép. Anh tô đen link rồi copy thủ công nhé.');}}
+    shortenBtn.addEventListener('click',shorten); copyBtn.addEventListener('click',copyShortUrl); longUrlInput.addEventListener('keydown',e=>{if(e.key==='Enter')shorten();}); customInput.addEventListener('keydown',e=>{if(e.key==='Enter')shorten();});
+  </script>
+</body>
+</html>
