@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rút Gọn Link - Toàn Bách</title>
+  <meta name="description" content="Ứng dụng rút gọn liên kết của Trịnh Toàn Bách." />
+  <meta property="og:title" content="Rút Gọn Link - Toàn Bách" />
+  <meta property="og:description" content="Dán liên kết dài để tạo link ngắn và QR nhanh chóng." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#111111" />
+  <style>
+    :root{
+      --bg1:#f8fbff;--bg2:#eefdf7;--card:#ffffff;--text:#172033;--muted:#6b7280;--dark:#111111;--accent:#10b981;--accent2:#ec4899;--danger:#ef4444;--line:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top left,#e8f6ff 0,#fff 38%,#effdf6 100%);min-height:100vh;}
+    .topbar{background:linear-gradient(90deg,#151515,#29211f);color:#fff;padding:22px 18px;font-size:24px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .topbar span:last-child{font-size:14px;font-weight:600;color:#d1d5db;background:#ffffff18;border:1px solid #ffffff25;padding:7px 12px;border-radius:999px}
+    .wrap{max-width:780px;margin:0 auto;padding:28px 16px 42px}
+    .hero{display:flex;gap:15px;align-items:center;margin-bottom:20px}
+    .icon{width:72px;height:72px;border-radius:18px;background:#111;display:grid;place-items:center;color:white;box-shadow:0 10px 25px #0002;flex:0 0 auto}
+    .icon svg{width:36px;height:36px}
+    h1{margin:0;font-size:30px;line-height:1.05;letter-spacing:-1px}.sub{margin-top:8px;color:var(--muted);font-weight:700;letter-spacing:4px;font-size:13px}
+    .card{background:rgba(255,255,255,.88);border:1px solid #ffffffaa;border-radius:26px;padding:18px;box-shadow:0 18px 45px #0f172a12;backdrop-filter:blur(10px)}
+    .form{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:stretch}.field{position:relative}.field svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:24px;height:24px;color:#9ca3af}
+    input{width:100%;height:64px;border:none;outline:none;background:#fff;border-radius:20px;padding:0 16px 0 52px;font-size:18px;box-shadow:inset 0 0 0 1px var(--line),0 8px 18px #00000008;color:var(--text)}
+    input:focus{box-shadow:inset 0 0 0 2px #86efac,0 8px 18px #00000008}.alias{margin-top:12px}.alias input{height:54px;font-size:15px;border-radius:18px;padding-left:16px}
+    button{border:none;cursor:pointer;border-radius:19px;font-weight:800;font-size:17px;transition:.15s transform,.15s opacity,.15s box-shadow}.primary{background:#111;color:#fff;padding:0 26px;box-shadow:0 12px 25px #0002}.primary:hover,.copy:hover,.download:hover,.new:hover{transform:translateY(-1px)}.primary:disabled{opacity:.55;cursor:wait;transform:none}
+    .tip{margin:14px 4px 2px;color:var(--muted);font-size:14px;line-height:1.5}.tip b{color:#111}
+    .result{display:none;margin-top:18px}.result.show{display:grid;gap:16px}.resultGrid{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start}.linkBox{background:#ecfdf5;border:2px solid #a7f3d0;border-radius:18px;padding:16px 18px;min-height:92px}.label{color:#047857;font-weight:900;letter-spacing:1.5px;font-size:13px}.short{display:block;margin-top:10px;font-size:24px;font-weight:900;color:#111;text-decoration:none;word-break:break-all}.copy{background:#111;color:#fff;padding:20px 24px;min-height:72px;display:flex;align-items:center;gap:10px;justify-content:center;white-space:nowrap}.copy svg,.download svg,.new svg{width:22px;height:22px}
+    .qrCard{margin:4px auto 0;background:#fff;border-radius:24px;padding:24px 22px;max-width:420px;text-align:center;box-shadow:0 15px 36px #00000012;border:1px solid var(--line)}.qrCard img{width:230px;max-width:100%;height:auto;image-rendering:pixelated;border-radius:10px}.actions{display:grid;gap:12px;margin-top:18px}.download,.new{height:56px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;gap:10px;justify-content:center;color:#111}.new{border-color:#fecdd3;color:#e11d48;background:#fff7f7}.status{display:none;margin-top:14px;padding:13px 15px;border-radius:14px;font-weight:700}.status.ok{display:block;background:#ecfdf5;color:#065f46;border:1px solid #a7f3d0}.status.err{display:block;background:#fff1f2;color:#be123c;border:1px solid #fecdd3}
+    .foot{margin-top:26px;text-align:center;color:#6b7280;font-size:13px}.foot a{color:#111;font-weight:800;text-decoration:none}
+    @media(max-width:620px){.topbar{font-size:20px}.wrap{padding-top:22px}.hero{align-items:flex-start}.icon{width:62px;height:62px}h1{font-size:25px}.sub{letter-spacing:3px}.form,.resultGrid{grid-template-columns:1fr}.primary{height:62px}.copy{width:100%}.short{font-size:21px}}
+  </style>
+</head>
+<body>
+  <div class="topbar"><span>Rút Gọn Link Ngắn</span><span>Toàn Bách</span></div>
+  <main class="wrap">
+    <section class="hero">
+      <div class="icon" aria-hidden="true"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 6.5l1.3-1.3a4 4 0 115.7 5.7l-3.4 3.4a4 4 0 01-5.7 0m-.9 3.2l-1.3 1.3a4 4 0 01-5.7-5.7l3.4-3.4a4 4 0 015.7 0"/></svg></div>
+      <div><h1>Rút Gọn Link</h1><div class="sub">PREMIUM UTILITY</div></div>
+    </section>
+
+    <section class="card">
+      <div class="form">
+        <div class="field">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.5 6.5l1.3-1.3a4 4 0 115.7 5.7l-3.4 3.4a4 4 0 01-5.7 0m-.9 3.2l-1.3 1.3a4 4 0 01-5.7-5.7l3.4-3.4a4 4 0 015.7 0"/></svg>
+          <input id="urlInput" type="url" placeholder="Dán link cần rút gọn, ví dụ: https://toanbach.vercel.app/" autocomplete="off" />
+        </div>
+        <button id="shortenBtn" class="primary">Rút gọn</button>
+      </div>
+      <div class="alias">
+        <input id="aliasInput" type="text" placeholder="Tên tùy chỉnh nếu muốn, ví dụ: toanbach hoặc tailieu2026 (có thể bỏ trống)" autocomplete="off" />
+      </div>
+      <p class="tip">Link tạo ra sẽ có dạng <b id="demoHost">/go/abcde</b>. Muốn dùng tên đẹp thì điền ô tùy chỉnh, ví dụ <b>/go/toanbach</b>.</p>
+      <div id="status" class="status"></div>
+
+      <section id="result" class="result">
+        <div class="resultGrid">
+          <div class="linkBox">
+            <div class="label">LINK RÚT GỌN:</div>
+            <a id="shortLink" class="short" href="#" target="_blank" rel="noopener"></a>
+          </div>
+          <button id="copyBtn" class="copy"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3H6a2 2 0 00-2 2v10"/></svg>Sao chép</button>
+        </div>
+        <div class="qrCard">
+          <img id="qrImg" alt="QR code link rút gọn" />
+          <div class="actions">
+            <button id="copyQrBtn" class="copy"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h10a2 2 0 012 2v10a2 2 0 01-2 2H8a2 2 0 01-2-2V9a2 2 0 012-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 3H6a2 2 0 00-2 2v10"/></svg>Sao chép QR</button>
+            <button id="downloadQrBtn" class="download"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0l-4-4m4 4l4-4M4 19h16"/></svg>Tải QR xuống</button>
+            <button id="newBtn" class="new"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0019 5"/></svg>Tạo link mới</button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <div class="foot">Ứng dụng rút gọn link riêng trên <a href="/">toanbach.vercel.app</a></div>
+  </main>
+
+  <script>
+    const $ = id => document.getElementById(id);
+    const urlInput = $('urlInput');
+    const aliasInput = $('aliasInput');
+    const shortenBtn = $('shortenBtn');
+    const statusBox = $('status');
+    const result = $('result');
+    const shortLink = $('shortLink');
+    const qrImg = $('qrImg');
+    let currentShortUrl = '';
+
+    $('demoHost').textContent = location.origin + '/go/abcde';
+
+    function showStatus(msg, type='ok') {
+      statusBox.className = 'status ' + (type === 'err' ? 'err' : 'ok');
+      statusBox.textContent = msg;
+    }
+
+    function clearStatus() {
+      statusBox.className = 'status';
+      statusBox.textContent = '';
+    }
+
+    async function shorten() {
+      clearStatus();
+      const url = urlInput.value.trim();
+      const alias = aliasInput.value.trim();
+      if (!url) return showStatus('Đại ka nhập hoặc dán link trước nhé.', 'err');
+
+      shortenBtn.disabled = true;
+      shortenBtn.textContent = 'Đang tạo...';
+      try {
+        const res = await fetch('/api/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, alias })
+        });
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'Không tạo được link.');
+
+        currentShortUrl = data.shortUrl;
+        shortLink.textContent = data.shortUrl.replace(/^https?:\/\//, '');
+        shortLink.href = data.shortUrl;
+        qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=12&data=' + encodeURIComponent(data.shortUrl);
+        result.classList.add('show');
+        showStatus('Tạo link thành công. Bấm Sao chép để gửi cho người khác nhé.', 'ok');
+      } catch (err) {
+        showStatus(err.message || 'Có lỗi xảy ra.', 'err');
+      } finally {
+        shortenBtn.disabled = false;
+        shortenBtn.textContent = 'Rút gọn';
+      }
+    }
+
+    async function copyText(text, label='Đã sao chép') {
+      try {
+        await navigator.clipboard.writeText(text);
+        showStatus(label, 'ok');
+      } catch (_) {
+        showStatus('Trình duyệt không cho sao chép tự động, anh giữ tay để copy thủ công nhé.', 'err');
+      }
+    }
+
+    shortenBtn.addEventListener('click', shorten);
+    urlInput.addEventListener('keydown', e => { if (e.key === 'Enter') shorten(); });
+    aliasInput.addEventListener('keydown', e => { if (e.key === 'Enter') shorten(); });
+    $('copyBtn').addEventListener('click', () => currentShortUrl && copyText(currentShortUrl, 'Đã sao chép link rút gọn.'));
+    $('copyQrBtn').addEventListener('click', () => currentShortUrl && copyText(currentShortUrl, 'Đã sao chép nội dung QR/link.'));
+    $('downloadQrBtn').addEventListener('click', () => {
+      if (!currentShortUrl) return;
+      const a = document.createElement('a');
+      a.href = qrImg.src;
+      a.download = 'qr-link-toanbach.png';
+      a.target = '_blank';
+      a.click();
+    });
+    $('newBtn').addEventListener('click', () => {
+      urlInput.value = '';
+      aliasInput.value = '';
+      currentShortUrl = '';
+      result.classList.remove('show');
+      clearStatus();
+      urlInput.focus();
+    });
+  </script>
+</body>
+</html>
