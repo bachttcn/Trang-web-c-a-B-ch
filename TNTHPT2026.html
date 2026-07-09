@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Công cụ tính điểm xét tốt nghiệp THPT 2026</title>
+  <style>
+    :root{
+      --bg1:#e0f2fe;
+      --bg2:#fef3c7;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#dbeafe;
+      --blue:#2563eb;
+      --blue2:#1d4ed8;
+      --green:#16a34a;
+      --red:#dc2626;
+      --yellow:#f59e0b;
+      --purple:#7c3aed;
+      --shadow:0 18px 45px rgba(15,23,42,.12);
+      --radius:20px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      color:var(--text);
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
+      padding:18px;
+    }
+    .app{max-width:1180px;margin:0 auto}
+    .hero{
+      background:linear-gradient(135deg,#1d4ed8,#06b6d4);
+      color:white;
+      border-radius:26px;
+      padding:24px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;
+      right:-80px;top:-80px;
+      width:240px;height:240px;
+      background:rgba(255,255,255,.16);
+      border-radius:50%;
+    }
+    .hero h1{margin:0 0 8px;font-size:28px;line-height:1.25;position:relative;z-index:1}
+    .hero p{margin:6px 0 0;line-height:1.55;opacity:.95;position:relative;z-index:1}
+    .grid{display:grid;grid-template-columns:1.12fr .88fr;gap:18px;margin-top:18px}
+    .card{
+      background:rgba(255,255,255,.94);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:18px;
+    }
+    .card h2{font-size:20px;margin:0 0 12px;color:#0f3b8f}
+    .card h3{font-size:16px;margin:18px 0 10px;color:#164e63}
+    .note{
+      background:#eff6ff;
+      border-left:5px solid var(--blue);
+      border-radius:14px;
+      padding:12px;
+      color:#1e3a8a;
+      line-height:1.5;
+      margin:12px 0;
+    }
+    .formula{
+      background:#fff7ed;
+      border:1px dashed #fb923c;
+      border-radius:16px;
+      padding:12px;
+      line-height:1.7;
+      font-weight:600;
+      color:#7c2d12;
+      overflow:auto;
+    }
+    label{font-weight:700;font-size:13px;color:#334155;display:block;margin-bottom:6px}
+    input,select,textarea,button{
+      font-family:inherit;
+      font-size:15px;
+    }
+    input,select,textarea{
+      width:100%;
+      border:1px solid #cbd5e1;
+      border-radius:12px;
+      padding:11px 12px;
+      background:white;
+      outline:none;
+      transition:.15s;
+    }
+    textarea{min-height:92px;resize:vertical;line-height:1.45}
+    input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.12)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    .row4{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:10px;align-items:end}
+    .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+    button{
+      border:0;border-radius:13px;
+      padding:11px 14px;
+      cursor:pointer;
+      font-weight:700;
+      transition:.15s;
+    }
+    button:hover{transform:translateY(-1px);filter:brightness(.98)}
+    .btn-primary{background:var(--blue);color:white}
+    .btn-primary:hover{background:var(--blue2)}
+    .btn-green{background:var(--green);color:white}
+    .btn-ghost{background:#e2e8f0;color:#0f172a}
+    .btn-red{background:#fee2e2;color:#991b1b}
+    .btn-purple{background:var(--purple);color:white}
+    .mini{font-size:13px;padding:8px 10px;border-radius:10px}
+    .table-wrap{overflow:auto;border:1px solid #e2e8f0;border-radius:15px}
+    table{width:100%;border-collapse:collapse;background:white}
+    th,td{padding:9px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:middle}
+    th{font-size:13px;color:#334155;background:#f8fafc}
+    tr:last-child td{border-bottom:0}
+    .subject-input{min-width:105px}
+    .muted{color:var(--muted);font-size:13px;line-height:1.45}
+    .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:#f1f5f9;color:#334155;font-size:13px;font-weight:700;margin:4px 4px 0 0}
+    .switch{display:flex;align-items:center;gap:9px;margin:8px 0 2px;color:#334155;font-weight:700}
+    .switch input{width:auto;transform:scale(1.15)}
+    .resultBox{
+      position:sticky;top:12px;
+      background:linear-gradient(180deg,#ffffff,#f8fafc);
+    }
+    .bigScore{
+      text-align:center;
+      border-radius:20px;
+      padding:18px;
+      background:linear-gradient(135deg,#dbeafe,#f0fdf4);
+      border:1px solid #bfdbfe;
+      margin:8px 0 14px;
+    }
+    .bigScore .label{font-weight:800;color:#1e3a8a}
+    .bigScore .score{font-size:54px;line-height:1;font-weight:900;margin:8px 0;color:#0f172a}
+    .status{font-size:20px;font-weight:900;margin-top:8px}
+    .pass{color:var(--green)}
+    .fail{color:var(--red)}
+    .warn{color:#b45309}
+    .breakdown{display:grid;gap:8px;margin-top:10px}
+    .lineItem{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed #cbd5e1;padding:8px 0;font-size:15px}
+    .lineItem b{text-align:right}
+    .hide{display:none!important}
+    .footer{margin:18px 0 4px;text-align:center;color:#475569;font-size:13px}
+    .linkBtn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;border-radius:13px;padding:11px 14px;font-weight:700;background:#0f172a;color:white}
+    .badInput{border-color:#ef4444!important;box-shadow:0 0 0 4px rgba(239,68,68,.12)!important}
+    .subject-custom{margin-top:6px}
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr}
+      .resultBox{position:static}
+      .row,.row3{grid-template-columns:1fr}
+      .row4{grid-template-columns:1fr}
+      .hero h1{font-size:23px}
+      body{padding:10px}
+      .card{padding:14px}
+    }
+    @media print{
+      body{background:white;padding:0}
+      .hero,.actions,.lookup,.pasteBox,.btn-red,.btn-ghost,.btn-purple,.no-print{display:none!important}
+      .grid{display:block}
+      .card{box-shadow:none;border:1px solid #ddd;margin-bottom:12px}
+      .resultBox{position:static}
+    }
+/* Khung các nút tra cứu */
+.linkBox{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 14px;
+    margin: 20px 0 18px;
+    padding: 16px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #eef7ff, #f7efff);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    box-shadow:
+        0 12px 28px rgba(15, 23, 42, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+/* Nút link tra cứu */
+.linkBtn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    padding: 12px 18px;
+    border-radius: 17px;
+    color: #ffffff !important;
+    text-decoration: none !important;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: 0.2px;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.16);
+    transition: all 0.22s ease;
+}
+
+/* Màu từng nút */
+.btn-so{
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+}
+
+.btn-tuoi-tre{
+    background: linear-gradient(135deg, #7c3aed, #ec4899);
+}
+
+.btn-vietnamnet{
+    background: linear-gradient(135deg, #0f172a, #334155);
+}
+
+/* Hiệu ứng rê chuột */
+.linkBtn:hover{
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(15, 23, 42, 0.24);
+    filter: brightness(1.06);
+}
+
+.linkBtn:active{
+    transform: translateY(0);
+}
+
+/* Điện thoại */
+@media (max-width: 600px){
+    .linkBox{
+        grid-template-columns: 1fr;
+        padding: 12px;
+        border-radius: 20px;
+    }
+
+    .linkBtn{
+        font-size: 16px;
+        min-height: 50px;
+    }
+}
+  </style>
+</head>
+<body>
+<div class="app">
+  <section class="hero">
+    <h1>Công cụ tra cứu và tính điểm xét tốt nghiệp THPT 2026 (Tham khảo) </h1>
+    <p>Tính ĐXTN theo công thức: điểm thi + điểm khuyến khích + điểm trung bình học bạ 3 năm THPT + điểm ưu tiên.</p>
+    <p class="muted" style="color:rgba(255,255,255,.9)">Công cụ chạy trực tiếp trên trình duyệt, không cần cài đặt. Kết quả chỉ để tham khảo; kết quả chính thức do Bộ GDĐT/Sở GDĐT công bố.</p>
+  </section>
+
+  <div class="grid">
+    <main>
+      <section class="card lookup">
+        <h2>1) Tra cứu điểm thi chính thức</h2>
+        <div class="row">
+          <div>
+            <label for="sbd">Số báo danh</label>
+            <input id="sbd" placeholder="Ví dụ: 64000001" />
+          </div>
+          <div>
+            <label for="hoten">Họ tên thí sinh</label>
+            <input id="hoten" placeholder="Nhập nếu muốn in/lưu kết quả" />
+          </div>
+       <div class="actions linkBox">
+    <a class="linkBtn btn-so" href="https://tracuudiem.vinhlong.edu.vn" target="_blank" rel="noopener">
+        🏫 Tra cứu Sở GDĐT Vĩnh Long
+    </a>
+    <a class="linkBtn btn-tuoi-tre" href="https://tuoitre.vn/diem-thi.htm" target="_blank" rel="noopener">
+        📰 Tra cứu Báo Tuổi trẻ
+    </a>
+    <a class="linkBtn btn-vietnamnet" href="https://vietnamnet.vn/giao-duc/diem-thi/tra-cuu-diem-thi-tot-nghiep-thpt-2026" target="_blank" rel="noopener">
+        🔎 Tra cứu Báo Vietnamnet
+    </a>
+</div>
+        <p class="muted">Trang tra cứu thường có mã xác nhận, nên tool này không tự lấy điểm trực tiếp được. Anh/Chị tra cứu xong rồi nhập điểm vào phần bên dưới, hoặc dán bảng điểm vào ô nhận diện nhanh.</p>
+      </section>
+      <section class="card pasteBox">
+        <h2>2) Dán nhanh bảng điểm đã tra cứu</h2>
+        <textarea id="pasteScore" placeholder="Ví dụ dán: Toán 7.50, Ngữ văn 6.75, Tiếng Anh 8.2, Lịch sử 7, Địa lí 8..."></textarea>
+        <div class="actions">
+          <button class="btn-purple" type="button" onclick="autoFillFromText()">Tự điền điểm thi từ nội dung dán</button>
+          <button class="btn-ghost" type="button" onclick="document.getElementById('pasteScore').value=''">Xóa nội dung dán</button>
+        </div>
+      </section>
+      <section class="card">
+        <h2>3) Điểm các môn dự thi</h2>
+        <p class="muted">Nhập các môn dùng để xét công nhận tốt nghiệp. Môn thi có danh sách chọn sẵn; nếu cần môn khác thì chọn “Khác / nhập tay”. Tool sẽ lấy tổng điểm chia cho số môn đã nhập điểm.</p>
+        <div class="table-wrap">
+          <table id="examTable">
+            <thead>
+              <tr>
+                <th style="width:48%">Môn thi</th>
+                <th>Điểm thi</th>
+                <th class="no-print">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="examBody"></tbody>
+          </table>
+        </div>
+        <div class="actions no-print">
+          <button class="btn-primary" type="button" onclick="addExamRow()">+ Thêm môn</button>
+          <button class="btn-ghost" type="button" onclick="loadDefaultExamSubjects()">Khôi phục 4 dòng mẫu</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>4) Điểm học bạ 3 năm THPT</h2>
+        <div class="formula">
+          ĐTB các năm học = [(ĐTB lớp 10 × 1) + (ĐTB lớp 11 × 2) + (ĐTB lớp 12 × 3)] / 6<br>
+          Nếu Anh/Chị đã có sẵn ĐTB học bạ 3 năm thì chọn “Nhập trực tiếp ĐTB học bạ 3 năm” để nhập thẳng, không cần nhập từng năm.
+        </div>
+        <h3>Chọn cách nhập điểm học bạ</h3>
+        <div class="row">
+          <div>
+            <label for="schoolAvgMode">Cách nhập điểm học bạ</label>
+            <select id="schoolAvgMode" onchange="schoolAvgModeChanged()">
+              <option value="yearly">Nhập ĐTB lớp 10, 11, 12</option>
+              <option value="total">Nhập trực tiếp ĐTB học bạ 3 năm</option>
+              <option value="subjects">Tính ĐTB từng năm từ bảng điểm từng môn</option>
+            </select>
+          </div>
+          <div id="avgAllWrap" class="hide">
+            <label for="avgAll">ĐTB học bạ 3 năm đã tính sẵn</label>
+            <input id="avgAll" inputmode="decimal" placeholder="VD: 7,86" oninput="calculateAll()" />
+          </div>
+        </div>
+        <div id="yearAvgBox">
+          <h3>Nhập nhanh ĐTB từng năm học</h3>
+          <div class="row3">
+            <div>
+              <label for="avg10">ĐTB lớp 10</label>
+              <input id="avg10" inputmode="decimal" placeholder="VD: 7,25" oninput="calculateAll()" />
+            </div>
+            <div>
+              <label for="avg11">ĐTB lớp 11</label>
+              <input id="avg11" inputmode="decimal" placeholder="VD: 7,50" oninput="calculateAll()" />
+            </div>
+            <div>
+              <label for="avg12">ĐTB lớp 12</label>
+              <input id="avg12" inputmode="decimal" placeholder="VD: 8,10" oninput="calculateAll()" />
+            </div>
+          </div>
+        </div>
+        <div id="subjectAvgBox" class="hide">
+          <p class="muted">Chọn môn học trong danh sách có sẵn rồi nhập điểm từng năm. Ô nào để trống sẽ được bỏ qua. Sau khi nhập, tool tự tính ĐTB lớp 10, 11, 12 và đưa lên 3 ô phía trên.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Môn học</th>
+                  <th>Lớp 10</th>
+                  <th>Lớp 11</th>
+                  <th>Lớp 12</th>
+                  <th class="no-print">Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="schoolBody"></tbody>
+            </table>
+          </div>
+          <div class="actions no-print">
+            <button class="btn-primary" type="button" onclick="addSchoolSubject()">+ Thêm môn học</button>
+            <button class="btn-ghost" type="button" onclick="loadDefaultSchoolSubjects()">Khôi phục môn mẫu</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>5) Điểm cộng và điều kiện xét tốt nghiệp</h2>
+        <div class="row">
+          <div>
+            <label for="bonus">Tổng điểm khuyến khích, nếu có</label>
+            <input id="bonus" inputmode="decimal" placeholder="VD: 0 hoặc 1,5 hoặc 2" oninput="calculateAll()" />
+          </div>
+          <div>
+            <label for="prioritySelect">Điểm ưu tiên</label>
+            <select id="prioritySelect" onchange="priorityChanged(); calculateAll()">
+              <option value="0">0 - Không có</option>
+              <option value="0.25">0,25</option>
+              <option value="0.5">0,50</option>
+              <option value="custom">Khác / tự nhập</option>
+            </select>
+          </div>
+        </div>
+        <div id="priorityCustomWrap" class="hide" style="margin-top:12px">
+          <label for="priorityCustom">Nhập điểm ưu tiên khác</label>
+          <input id="priorityCustom" inputmode="decimal" placeholder="VD: 0,25" oninput="calculateAll()" />
+        </div>
+        <div class="row" style="margin-top:12px">
+          <label class="switch"><input id="eligible" type="checkbox" checked onchange="calculateAll()" /> Đủ điều kiện dự thi</label>
+          <label class="switch"><input id="notDisciplined" type="checkbox" checked onchange="calculateAll()" /> Không bị kỷ luật hủy kết quả thi</label>
+        </div>
+      </section>
+    </main>
+
+    <aside>
+      <section class="card resultBox">
+        <h2>Kết quả tính tự động</h2>
+        <div class="bigScore">
+          <div class="label">ĐIỂM XÉT TỐT NGHIỆP</div>
+          <div id="finalScore" class="score">--</div>
+          <div id="status" class="status warn">Chưa đủ dữ liệu</div>
+        </div>
+        <div id="candidateInfo" class="muted"></div>
+        <div class="breakdown">
+          <div class="lineItem"><span>Tổng điểm thi</span><b id="sumExam">--</b></div>
+          <div class="lineItem"><span>Số môn dự thi</span><b id="countExam">--</b></div>
+          <div class="lineItem"><span>TB điểm thi</span><b id="avgExam">--</b></div>
+          <div class="lineItem"><span>Điểm KK / 4</span><b id="bonus4">--</b></div>
+          <div class="lineItem"><span>ĐTB lớp 10</span><b id="show10">--</b></div>
+          <div class="lineItem"><span>ĐTB lớp 11</span><b id="show11">--</b></div>
+          <div class="lineItem"><span>ĐTB lớp 12</span><b id="show12">--</b></div>
+          <div class="lineItem"><span>ĐTB các năm học</span><b id="schoolAvg">--</b></div>
+          <div class="lineItem"><span>Cách nhập học bạ</span><b id="schoolModeShow">--</b></div>
+          <div class="lineItem"><span>Điểm ưu tiên</span><b id="priorityShow">--</b></div>
+          <div class="lineItem"><span>Điểm thấp nhất trong các môn thi</span><b id="minExam">--</b></div>
+        </div>
+        <div id="messages" class="note"></div>
+        <div class="actions no-print">
+          <button class="btn-green" type="button" onclick="calculateAll(true)">Tính điểm</button>
+          <button class="btn-primary" type="button" onclick="window.print()">In / lưu PDF</button>
+          <button class="btn-ghost" type="button" onclick="saveData()">Lưu trên máy</button>
+          <button class="btn-red" type="button" onclick="clearAll()">Xóa nhập lại</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Công thức đang dùng</h2>
+        <div class="formula">
+          ĐXTN = {[(Tổng điểm các môn dự thi / Tổng số môn dự thi) + (Tổng điểm KK / 4)] + ĐTB các năm học} / 2 + Điểm ƯT
+        </div>
+        <div class="note">
+          Điều kiện đạt: đủ điều kiện dự thi, không bị hủy kết quả, tất cả môn thi trên 1,0 điểm và ĐXTN từ 5,00 trở lên.
+        </div>
+        <p class="muted">ĐTB từng năm học và ĐTB các năm học được làm tròn 2 chữ số thập phân. Tool chấp nhận cả dấu phẩy hoặc dấu chấm khi nhập số.</p>
+      </section>
+    </aside>
+  </div>
+  <div class="footer">Cọng cụ tính điểm THPT 2026 - Có thể lưu thành file HTML và mở trên điện thoại/máy tính.</div>
+</div>
+
+<script>
+  const examSubjectChoices = ["Ngữ văn", "Toán", "Ngoại ngữ", "Vật lí", "Hóa học", "Sinh học", "Lịch sử", "Địa lí", "GDKT&PL/GDCD", "Tin học", "Công nghệ"];
+  const schoolSubjectChoices = ["Ngữ văn", "Toán", "Ngoại ngữ", "Vật lí", "Hóa học", "Sinh học", "Lịch sử", "Địa lí", "GDKT&PL/GDCD", "Tin học", "Công nghệ", "GDQP-AN"];
+  const examDefaults = ["Ngữ văn", "Toán", "", ""];
+  const schoolDefaults = [...schoolSubjectChoices];
+
+  function parseVNNumber(value){
+    if(value === null || value === undefined) return NaN;
+    let s = String(value).trim().replace(/\s/g, "");
+    if(!s) return NaN;
+    s = s.replace(/[^0-9,\.\-]/g, "");
+    if((s.match(/,/g)||[]).length > 1 && !s.includes('.')){
+      const last = s.lastIndexOf(',');
+      s = s.slice(0,last).replace(/,/g,'') + '.' + s.slice(last+1);
+    } else if(s.includes(',') && s.includes('.')){
+      s = s.replace(/\./g,'').replace(',', '.');
+    } else if(s.includes(',')){
+      s = s.replace(',', '.');
+    }
+    const n = Number(s);
+    return Number.isFinite(n) ? n : NaN;
+  }
+
+  function round2(n){ return Math.round((n + Number.EPSILON) * 100) / 100; }
+  function fmt(n){
+    if(!Number.isFinite(n)) return "--";
+    return round2(n).toLocaleString('vi-VN', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+  function valueOf(id){ return parseVNNumber(document.getElementById(id).value); }
+
+  function validateScoreInput(input, allowBlank=true){
+    const raw = input.value.trim();
+    if(!raw && allowBlank){ input.classList.remove('badInput'); return null; }
+    const n = parseVNNumber(raw);
+    const ok = Number.isFinite(n) && n >= 0 && n <= 10;
+    input.classList.toggle('badInput', !ok);
+    return ok ? n : NaN;
+  }
+
+  function subjectList(type){
+    return type === 'exam' ? examSubjectChoices : schoolSubjectChoices;
+  }
+
+  function subjectOptionsHtml(selected="", type="exam"){
+    const choices = subjectList(type);
+    const selectedText = String(selected || '').trim();
+    const isCustom = selectedText && !choices.includes(selectedText);
+    let html = '<option value="">-- Chọn môn --</option>';
+    choices.forEach(s => {
+      const selectedAttr = (!isCustom && s === selectedText) ? ' selected' : '';
+      html += `<option value="${escapeHtml(s)}"${selectedAttr}>${escapeHtml(s)}</option>`;
+    });
+    html += `<option value="__custom"${isCustom ? ' selected' : ''}>Khác / nhập tay</option>`;
+    return html;
+  }
+
+  function customSubjectClass(name="", type="exam"){
+    const selectedText = String(name || '').trim();
+    return selectedText && !subjectList(type).includes(selectedText) ? '' : 'hide';
+  }
+
+  function customSubjectValue(name="", type="exam"){
+    const selectedText = String(name || '').trim();
+    return selectedText && !subjectList(type).includes(selectedText) ? escapeHtml(selectedText) : '';
+  }
+
+  function subjectSelectChanged(select){
+    const input = select.closest('td').querySelector('.subject-custom');
+    if(!input) return;
+    input.classList.toggle('hide', select.value !== '__custom');
+    if(select.value !== '__custom') input.value = '';
+  }
+
+  function getSubjectName(row, type){
+    const select = row.querySelector('.' + type + '-name-select');
+    if(select){
+      if(select.value === '__custom'){
+        const custom = row.querySelector('.' + type + '-name-custom');
+        const val = custom ? custom.value.trim() : '';
+        return val || (type === 'exam' ? 'Môn thi khác' : 'Môn học khác');
+      }
+      return select.value || (type === 'exam' ? 'Môn thi' : 'Môn học');
+    }
+    const legacy = row.querySelector('.' + type + '-name');
+    return legacy ? (legacy.value.trim() || (type === 'exam' ? 'Môn thi' : 'Môn học')) : (type === 'exam' ? 'Môn thi' : 'Môn học');
+  }
+
+  function addExamRow(name="", score=""){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <select class="exam-name-select" onchange="subjectSelectChanged(this); calculateAll()">${subjectOptionsHtml(name, 'exam')}</select>
+        <input class="exam-name-custom subject-custom ${customSubjectClass(name, 'exam')}" value="${customSubjectValue(name, 'exam')}" placeholder="Nhập tên môn khác" oninput="calculateAll()">
+      </td>
+      <td><input class="exam-score subject-input" inputmode="decimal" value="${escapeHtml(score)}" placeholder="0 - 10" oninput="calculateAll()"></td>
+      <td class="no-print"><button class="btn-red mini" type="button" onclick="this.closest('tr').remove(); calculateAll();">Xóa</button></td>`;
+    document.getElementById('examBody').appendChild(tr);
+    calculateAll();
+  }
+
+  function loadDefaultExamSubjects(){
+    document.getElementById('examBody').innerHTML = '';
+    examDefaults.forEach(s => addExamRow(s, ''));
+    calculateAll();
+  }
+
+  function addSchoolSubject(name="", d10="", d11="", d12=""){
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>
+        <select class="school-name-select" onchange="subjectSelectChanged(this); calcSchoolFromSubjects()">${subjectOptionsHtml(name, 'school')}</select>
+        <input class="school-name-custom subject-custom ${customSubjectClass(name, 'school')}" value="${customSubjectValue(name, 'school')}" placeholder="Nhập tên môn khác" oninput="calcSchoolFromSubjects()">
+      </td>
+      <td><input class="school-10 subject-input" inputmode="decimal" value="${escapeHtml(d10)}" placeholder="0 - 10" oninput="calcSchoolFromSubjects()"></td>
+      <td><input class="school-11 subject-input" inputmode="decimal" value="${escapeHtml(d11)}" placeholder="0 - 10" oninput="calcSchoolFromSubjects()"></td>
+      <td><input class="school-12 subject-input" inputmode="decimal" value="${escapeHtml(d12)}" placeholder="0 - 10" oninput="calcSchoolFromSubjects()"></td>
+      <td class="no-print"><button class="btn-red mini" type="button" onclick="this.closest('tr').remove(); calcSchoolFromSubjects();">Xóa</button></td>`;
+    document.getElementById('schoolBody').appendChild(tr);
+  }
+
+  function loadDefaultSchoolSubjects(){
+    document.getElementById('schoolBody').innerHTML = '';
+    schoolDefaults.forEach(s => addSchoolSubject(s, '', '', ''));
+    calcSchoolFromSubjects();
+  }
+
+  function getSchoolAvgMode(){
+    const el = document.getElementById('schoolAvgMode');
+    return el ? el.value : 'yearly';
+  }
+
+  function schoolModeLabel(mode){
+    if(mode === 'total') return 'Nhập trực tiếp ĐTB 3 năm';
+    if(mode === 'subjects') return 'Tính từ điểm từng môn';
+    return 'Nhập ĐTB lớp 10, 11, 12';
+  }
+
+  function schoolAvgModeChanged(){
+    const mode = getSchoolAvgMode();
+    document.getElementById('avgAllWrap').classList.toggle('hide', mode !== 'total');
+    document.getElementById('yearAvgBox').classList.toggle('hide', mode === 'total');
+    document.getElementById('subjectAvgBox').classList.toggle('hide', mode !== 'subjects');
+    ['avg10','avg11','avg12'].forEach(id => {
+      const el = document.getElementById(id);
+      el.readOnly = mode === 'subjects';
+    });
+    if(mode === 'subjects' && !document.getElementById('schoolBody').children.length){
+      loadDefaultSchoolSubjects();
+      return;
+    }
+    if(mode === 'subjects') calcSchoolFromSubjects();
+    calculateAll();
+  }
+
+  function toggleSubjectAvg(){
+    const modeEl = document.getElementById('schoolAvgMode');
+    if(modeEl) modeEl.value = 'subjects';
+    schoolAvgModeChanged();
+  }
+
+  function calcAverageFromClass(className){
+    let arr = [...document.querySelectorAll('.' + className)].map(i => validateScoreInput(i, true)).filter(n => Number.isFinite(n));
+    if(!arr.length) return NaN;
+    return round2(arr.reduce((a,b)=>a+b,0) / arr.length);
+  }
+
+  function calcSchoolFromSubjects(){
+    if(getSchoolAvgMode() !== 'subjects') { calculateAll(); return; }
+    const a10 = calcAverageFromClass('school-10');
+    const a11 = calcAverageFromClass('school-11');
+    const a12 = calcAverageFromClass('school-12');
+    if(Number.isFinite(a10)) document.getElementById('avg10').value = fmt(a10);
+    if(Number.isFinite(a11)) document.getElementById('avg11').value = fmt(a11);
+    if(Number.isFinite(a12)) document.getElementById('avg12').value = fmt(a12);
+    calculateAll();
+  }
+
+  function priorityChanged(){
+    const sel = document.getElementById('prioritySelect').value;
+    document.getElementById('priorityCustomWrap').classList.toggle('hide', sel !== 'custom');
+  }
+
+  function getPriority(){
+    const sel = document.getElementById('prioritySelect').value;
+    if(sel === 'custom') return parseVNNumber(document.getElementById('priorityCustom').value) || 0;
+    return Number(sel) || 0;
+  }
+
+  function getExamData(){
+    const rows = [...document.querySelectorAll('#examBody tr')];
+    const data = [];
+    rows.forEach(row => {
+      const name = getSubjectName(row, 'exam');
+      const input = row.querySelector('.exam-score');
+      const score = validateScoreInput(input, true);
+      if(Number.isFinite(score)) data.push({name, score});
+    });
+    return data;
+  }
+
+  function setText(id, text){ document.getElementById(id).textContent = text; }
+
+  function calculateAll(showAlert=false){
+    const exam = getExamData();
+    const sumExam = exam.reduce((a,b)=>a+b.score,0);
+    const countExam = exam.length;
+    const avgExam = countExam ? sumExam / countExam : NaN;
+    const minExam = countExam ? Math.min(...exam.map(x=>x.score)) : NaN;
+
+    const schoolMode = getSchoolAvgMode();
+    let avg10 = NaN, avg11 = NaN, avg12 = NaN, schoolAvg = NaN, schoolReady = false;
+    if(schoolMode === 'total'){
+      const avgAllInput = document.getElementById('avgAll');
+      const directAvg = validateScoreInput(avgAllInput, true);
+      schoolAvg = Number.isFinite(directAvg) ? round2(directAvg) : NaN;
+      schoolReady = Number.isFinite(schoolAvg);
+      ['avg10','avg11','avg12'].forEach(id => document.getElementById(id).classList.remove('badInput'));
+    } else {
+      avg10 = validateScoreInput(document.getElementById('avg10'), true);
+      avg11 = validateScoreInput(document.getElementById('avg11'), true);
+      avg12 = validateScoreInput(document.getElementById('avg12'), true);
+      schoolReady = [avg10,avg11,avg12].every(Number.isFinite);
+      schoolAvg = schoolReady ? round2((round2(avg10)*1 + round2(avg11)*2 + round2(avg12)*3) / 6) : NaN;
+      document.getElementById('avgAll').classList.remove('badInput');
+    }
+
+    const bonus = parseVNNumber(document.getElementById('bonus').value) || 0;
+    const priority = getPriority();
+    const bonusDiv4 = bonus / 4;
+    const final = (countExam && schoolReady) ? round2(((avgExam + bonusDiv4) + schoolAvg) / 2 + priority) : NaN;
+
+    setText('sumExam', countExam ? fmt(sumExam) : '--');
+    setText('countExam', countExam || '--');
+    setText('avgExam', countExam ? fmt(avgExam) : '--');
+    setText('bonus4', fmt(bonusDiv4));
+    setText('show10', Number.isFinite(avg10) ? fmt(avg10) : '--');
+    setText('show11', Number.isFinite(avg11) ? fmt(avg11) : '--');
+    setText('show12', Number.isFinite(avg12) ? fmt(avg12) : '--');
+    setText('schoolAvg', Number.isFinite(schoolAvg) ? fmt(schoolAvg) : '--');
+    setText('schoolModeShow', schoolModeLabel(schoolMode));
+    setText('priorityShow', fmt(priority));
+    setText('minExam', countExam ? fmt(minExam) : '--');
+    setText('finalScore', Number.isFinite(final) ? fmt(final) : '--');
+
+    const sbd = document.getElementById('sbd').value.trim();
+    const hoten = document.getElementById('hoten').value.trim();
+    document.getElementById('candidateInfo').innerHTML = [hoten ? '<b>Họ tên:</b> '+escapeHtml(hoten) : '', sbd ? '<b>SBD:</b> '+escapeHtml(sbd) : ''].filter(Boolean).join(' &nbsp; | &nbsp; ');
+
+    const eligible = document.getElementById('eligible').checked;
+    const notDisciplined = document.getElementById('notDisciplined').checked;
+    const noParalysis = countExam ? minExam > 1 : false;
+    const enoughData = countExam > 0 && schoolReady;
+    const pass = enoughData && eligible && notDisciplined && noParalysis && final >= 5;
+
+    const status = document.getElementById('status');
+    const messages = [];
+    status.className = 'status';
+
+    if(!enoughData){
+      status.textContent = 'Chưa đủ dữ liệu';
+      status.classList.add('warn');
+      if(!countExam) messages.push('Chưa nhập điểm môn thi. Anh/Chị bấm ô “Môn thi” để chọn môn cụ thể rồi nhập điểm.');
+      if(!schoolReady){
+        messages.push(schoolMode === 'total' ? 'Chưa nhập ĐTB học bạ 3 năm.' : 'Chưa đủ ĐTB lớp 10, 11, 12.');
+      }
+    } else if(pass){
+      status.textContent = 'DỰ KIẾN ĐẠT TỐT NGHIỆP';
+      status.classList.add('pass');
+      messages.push('Đủ điều kiện theo dữ liệu đã nhập: ĐXTN từ 5,00 trở lên và không có môn thi bị điểm liệt.');
+    } else {
+      status.textContent = 'DỰ KIẾN CHƯA ĐẠT';
+      status.classList.add('fail');
+      if(!eligible) messages.push('Chưa đánh dấu đủ điều kiện dự thi.');
+      if(!notDisciplined) messages.push('Thí sinh bị kỷ luật hủy kết quả thi sẽ không được công nhận tốt nghiệp.');
+      if(!noParalysis) messages.push('Có môn thi đạt từ 1,0 điểm trở xuống, chưa đạt điều kiện do điểm liệt.');
+      if(Number.isFinite(final) && final < 5) messages.push('ĐXTN dưới 5,00 điểm.');
+    }
+    if(schoolMode === 'total' && schoolReady) messages.push('Đang dùng ĐTB học bạ 3 năm nhập trực tiếp, không tính lại từ lớp 10, 11, 12.');
+    if(bonus > 4) messages.push('Lưu ý: điểm khuyến khích đang nhập lớn hơn 4, Anh/Chị kiểm tra lại theo hồ sơ thực tế.');
+    if(priority > 1) messages.push('Lưu ý: điểm ưu tiên đang nhập lớn hơn 1, Anh/Chị kiểm tra lại theo diện ưu tiên thực tế.');
+    messages.push('Kết quả này chỉ là tính tham khảo trên trình duyệt; khi xét chính thức phải theo dữ liệu và phần mềm của Bộ/Sở GDĐT.');
+    document.getElementById('messages').innerHTML = messages.map(m => '• ' + escapeHtml(m)).join('<br>');
+
+    if(showAlert && enoughData){
+      alert('ĐXTN = ' + fmt(final) + '\n' + status.textContent);
+    }
+    return {exam, avg10, avg11, avg12, schoolAvg, bonus, priority, final, schoolMode};
+  }
+
+  function normalizeSubjectKey(s){
+    return s.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g,'d').replace(/[^a-z0-9]/g,'');
+  }
+
+  function autoFillFromText(){
+    const text = document.getElementById('pasteScore').value;
+    if(!text.trim()){ alert('Anh/Chị dán nội dung bảng điểm trước nhé.'); return; }
+    const subjects = [
+      ['Ngữ văn', ['ngu van','van']],
+      ['Toán', ['toan']],
+      ['Ngoại ngữ', ['ngoai ngu','tieng anh','anh','english']],
+      ['Vật lí', ['vat li','vat ly','ly']],
+      ['Hóa học', ['hoa hoc','hoa']],
+      ['Sinh học', ['sinh hoc','sinh']],
+      ['Lịch sử', ['lich su','su']],
+      ['Địa lí', ['dia li','dia ly','dia']],
+      ['GDKT&PL/GDCD', ['gdcd','gdktpl','giao duc cong dan','kinh te phap luat']],
+      ['Tin học', ['tin hoc','tin']],
+      ['Công nghệ', ['cong nghe']]
+    ];
+    const found = [];
+    const cleanText = text.replace(/\n/g, ' ; ');
+    subjects.forEach(([display, keys]) => {
+      for(const key of keys){
+        const re = new RegExp(key.replace(/ /g,'\\s*') + '\\s*[:=\\-]?\\s*([0-9]{1,2}(?:[,.][0-9]{1,2})?)','i');
+        const noAccent = cleanText.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');
+        const m = noAccent.match(re);
+        if(m){
+          const score = parseVNNumber(m[1]);
+          if(Number.isFinite(score) && score >=0 && score <=10){ found.push([display, fmt(score)]); }
+          break;
+        }
+      }
+    });
+    if(!found.length){
+      alert('Chưa nhận diện được điểm. Anh/Chị có thể nhập tay vào bảng môn thi bên dưới.');
+      return;
+    }
+    document.getElementById('examBody').innerHTML = '';
+    found.forEach(x => addExamRow(x[0], x[1]));
+    calculateAll(true);
+  }
+
+  function saveData(){
+    const data = {
+      sbd: document.getElementById('sbd').value,
+      hoten: document.getElementById('hoten').value,
+      avg10: document.getElementById('avg10').value,
+      avg11: document.getElementById('avg11').value,
+      avg12: document.getElementById('avg12').value,
+      avgAll: document.getElementById('avgAll').value,
+      schoolAvgMode: getSchoolAvgMode(),
+      bonus: document.getElementById('bonus').value,
+      prioritySelect: document.getElementById('prioritySelect').value,
+      priorityCustom: document.getElementById('priorityCustom').value,
+      eligible: document.getElementById('eligible').checked,
+      notDisciplined: document.getElementById('notDisciplined').checked,
+      examRows: [...document.querySelectorAll('#examBody tr')].map(tr => ({
+        name: getSubjectName(tr, 'exam'),
+        score: tr.querySelector('.exam-score').value
+      })),
+      schoolRows: [...document.querySelectorAll('#schoolBody tr')].map(tr => ({
+        name: getSubjectName(tr, 'school'),
+        d10: tr.querySelector('.school-10').value,
+        d11: tr.querySelector('.school-11').value,
+        d12: tr.querySelector('.school-12').value
+      }))
+    };
+    localStorage.setItem('diemTNTHPT2026', JSON.stringify(data));
+    alert('Đã lưu dữ liệu trên trình duyệt này.');
+  }
+
+  function restoreData(){
+    const raw = localStorage.getItem('diemTNTHPT2026');
+    if(!raw) return false;
+    try{
+      const data = JSON.parse(raw);
+      ['sbd','hoten','avg10','avg11','avg12','avgAll','bonus','priorityCustom'].forEach(id => { if(data[id] !== undefined) document.getElementById(id).value = data[id]; });
+      if(data.prioritySelect) document.getElementById('prioritySelect').value = data.prioritySelect;
+      const mode = data.schoolAvgMode || (data.useSubjectAvg ? 'subjects' : 'yearly');
+      if(document.getElementById('schoolAvgMode')) document.getElementById('schoolAvgMode').value = mode;
+      document.getElementById('eligible').checked = data.eligible !== false;
+      document.getElementById('notDisciplined').checked = data.notDisciplined !== false;
+      priorityChanged();
+      document.getElementById('examBody').innerHTML = '';
+      (data.examRows || []).forEach(r => addExamRow(r.name, r.score));
+      document.getElementById('schoolBody').innerHTML = '';
+      (data.schoolRows || []).forEach(r => addSchoolSubject(r.name, r.d10, r.d11, r.d12));
+      schoolAvgModeChanged();
+      calculateAll();
+      return true;
+    }catch(e){ return false; }
+  }
+
+  function clearAll(){
+    if(!confirm('Xóa toàn bộ dữ liệu đang nhập và dữ liệu đã lưu trên trình duyệt này?')) return;
+    localStorage.removeItem('diemTNTHPT2026');
+    document.querySelectorAll('input, textarea').forEach(el => {
+      if(el.type === 'checkbox') return;
+      el.value = '';
+      el.classList.remove('badInput');
+    });
+    document.getElementById('eligible').checked = true;
+    document.getElementById('notDisciplined').checked = true;
+    document.getElementById('prioritySelect').value = '0';
+    document.getElementById('schoolAvgMode').value = 'yearly';
+    priorityChanged();
+    document.getElementById('examBody').innerHTML = '';
+    document.getElementById('schoolBody').innerHTML = '';
+    loadDefaultExamSubjects();
+    schoolAvgModeChanged();
+    calculateAll();
+  }
+
+  function escapeHtml(s){
+    return String(s ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  }
+
+  window.addEventListener('load', () => {
+    if(!restoreData()) loadDefaultExamSubjects();
+    calculateAll();
+  });
+</script>
+</body>
+</html>
