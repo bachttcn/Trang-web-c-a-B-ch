@@ -204,6 +204,27 @@
             box-shadow: 0 8px 18px rgba(139, 92, 246, 0.22);
         }
 
+        .btn-tnthpt {
+            background: linear-gradient(135deg, #1d4ed8, #7c3aed, #f59e0b);
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(124, 58, 237, 0.24);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-tnthpt::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.22), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.55s ease;
+        }
+
+        .btn-tnthpt:hover::after {
+            transform: translateX(100%);
+        }
+
         .footer-info {
             margin-top: 30px;
             font-size: 12px;
@@ -352,6 +373,10 @@
 
             <a href="https://toanbach.vercel.app/link.html" class="btn btn-shortlink" target="_blank" rel="noopener">
                 🔗 Rút gọn liên kết / Tạo mã QR
+            </a>
+
+            <a href="TNTHPT2026.html" class="btn btn-tnthpt" target="_blank" rel="noopener">
+                🎓 Tra cứu & tính điểm xét tốt nghiệp THPT 2026
             </a>
 
             <a href="https://toanbach.vercel.app/tinh_luong_giao_vien.html" class="btn btn-salary" target="_blank" rel="noopener">
