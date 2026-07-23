@@ -197,7 +197,31 @@
             background: linear-gradient(135deg, #22c55e, #0ea5e9);
             border-radius: 18px;
         }
+.btn-hc {
+    background: linear-gradient(135deg, #14b8a6, #0f766e);
+    border-radius: 18px;
+    box-shadow: 0 8px 18px rgba(20, 184, 166, 0.25);
+    position: relative;
+    overflow: hidden;
+}
 
+.btn-hc::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255,255,255,0.25),
+        transparent
+    );
+    transform: translateX(-100%);
+    transition: transform .55s ease;
+}
+
+.btn-hc:hover::after {
+    transform: translateX(100%);
+}
         .btn-shortlink {
             background: linear-gradient(135deg, #ec4899, #8b5cf6);
             border-radius: 18px;
@@ -378,7 +402,9 @@
             <a href="TNTHPT2026.html" class="btn btn-tnthpt" target="_blank" rel="noopener">
                 🎓 Tra cứu & tính điểm xét tốt nghiệp THPT 2026
             </a>
-
+<a href="hc.html" class="btn btn-hc" target="_blank" rel="noopener">
+    🗺️ Tra cứu đơn vị hành chính mới sau sáp nhập
+</a>
             <a href="https://toanbach.vercel.app/tinh_luong_giao_vien.html" class="btn btn-salary" target="_blank" rel="noopener">
                 🧮 Lương giáo viên mới theo NĐ 182/2026/NĐ-CP
             </a>
