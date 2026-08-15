@@ -144,15 +144,15 @@
             filter: brightness(1.1);
         }
 
-    .btn-facebook {
-    background: linear-gradient(135deg, #1877F2, #0B5ED7);
-    box-shadow: 0 8px 18px rgba(24, 119, 242, 0.22);
-}
+        .btn-facebook {
+            background: linear-gradient(135deg, #1877F2, #0B5ED7);
+            box-shadow: 0 8px 18px rgba(24, 119, 242, 0.22);
+        }
 
-    .btn-zalo {
-    background: linear-gradient(135deg, #00A3FF, #0068FF);
-    box-shadow: 0 8px 18px rgba(0, 104, 255, 0.22);
-}
+        .btn-zalo {
+            background: linear-gradient(135deg, #00A3FF, #0068FF);
+            box-shadow: 0 8px 18px rgba(0, 104, 255, 0.22);
+        }
             
         .btn-tiktok {
             background-color: var(--color-tiktok);
@@ -197,31 +197,33 @@
             background: linear-gradient(135deg, #22c55e, #0ea5e9);
             border-radius: 18px;
         }
-.btn-hc {
-    background: linear-gradient(135deg, #14b8a6, #0f766e);
-    border-radius: 18px;
-    box-shadow: 0 8px 18px rgba(20, 184, 166, 0.25);
-    position: relative;
-    overflow: hidden;
-}
+        
+        .btn-hc {
+            background: linear-gradient(135deg, #14b8a6, #0f766e);
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(20, 184, 166, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
 
-.btn-hc::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255,255,255,0.25),
-        transparent
-    );
-    transform: translateX(-100%);
-    transition: transform .55s ease;
-}
+        .btn-hc::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255,255,255,0.25),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform .55s ease;
+        }
 
-.btn-hc:hover::after {
-    transform: translateX(100%);
-}
+        .btn-hc:hover::after {
+            transform: translateX(100%);
+        }
+        
         .btn-shortlink {
             background: linear-gradient(135deg, #ec4899, #8b5cf6);
             border-radius: 18px;
@@ -246,6 +248,29 @@
         }
 
         .btn-tnthpt:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Thêm style cho nút Lịch Vạn Niên */
+        .btn-calendar {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c); /* Màu đỏ truyền thống */
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(211, 47, 47, 0.25);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #ffc107; /* Viền vàng nhẹ */
+        }
+
+        .btn-calendar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.55s ease;
+        }
+
+        .btn-calendar:hover::after {
             transform: translateX(100%);
         }
 
@@ -383,6 +408,12 @@
                 ✨ Trợ lý AI Thông minh (Gemini)
             </a>
 
+            <!-- NÚT LỊCH VẠN NIÊN MỚI THÊM VÀO ĐÂY -->
+            <a href="LICHVANNIEN.html" class="btn btn-calendar" target="_blank" rel="noopener">
+                📅 LỊCH VẠN NIÊN VIỆT NAM
+            </a>
+            <!-- KẾT THÚC NÚT LỊCH VẠN NIÊN -->
+
             <a href="http://ttgdtxcaungang.sgdtravinh.edu.vn/" class="btn btn-website" target="_blank" rel="noopener">
                 Website Cơ Quan
             </a>
@@ -402,9 +433,11 @@
             <a href="TNTHPT2026.html" class="btn btn-tnthpt" target="_blank" rel="noopener">
                 🎓 Tra cứu & tính điểm xét tốt nghiệp THPT 2026
             </a>
-<a href="hc.html" class="btn btn-hc" target="_blank" rel="noopener">
-    🗺️ Tra cứu đơn vị hành chính mới sau sáp nhập
-</a>
+            
+            <a href="hc.html" class="btn btn-hc" target="_blank" rel="noopener">
+                🗺️ Tra cứu đơn vị hành chính mới sau sáp nhập
+            </a>
+            
             <a href="https://toanbach.vercel.app/tinh_luong_giao_vien.html" class="btn btn-salary" target="_blank" rel="noopener">
                 🧮 Lương giáo viên mới theo NĐ 182/2026/NĐ-CP
             </a>
