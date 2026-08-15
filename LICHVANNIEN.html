@@ -133,10 +133,20 @@
                 </button>
             </div>
             
-            <div class="flex justify-center mb-6">
-                 <button id="btn-today" class="px-4 py-2 bg-red-50 text-red-600 font-medium rounded-full border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all text-sm shadow-sm">
-                    Trở về Hôm nay
+            <!-- Khu vực Công cụ: Nút Hôm nay & Ô Tìm kiếm Ngày -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <button id="btn-today" class="flex-shrink-0 px-4 py-2 bg-white text-red-600 font-medium rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all text-sm shadow-sm flex items-center gap-2">
+                    <i class="fas fa-calendar-day"></i> Trở về Hôm nay
                 </button>
+                
+                <div class="flex-grow w-full sm:w-auto relative flex items-center">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                    <!-- Ô Input Type Date để chọn ngày nhanh -->
+                    <input type="date" id="search-date" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-700 bg-white shadow-sm transition-all hover:border-gray-400 cursor-pointer" title="Chọn ngày cần tra cứu">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 pointer-events-none hidden sm:block">Tra cứu</span>
+                </div>
             </div>
 
             <!-- Lưới Lịch -->
@@ -379,10 +389,6 @@
              const chiDay = (jd + 1) % 12;
              
              // Ma trận giờ hoàng đạo theo Chi của ngày (đơn giản hóa)
-             // Tý, Ngọ: Tý, Sửu, Mão, Ngọ, Thân, Dậu
-             // Sửu, Mùi: Dần, Mão, Tỵ, Thân, Tuất, Hợi
-             // ... (Rút gọn cho mục đích hiển thị giao diện)
-             
              if (chiDay === 4 || chiDay === 10) { // Tý, Ngọ
                  return "Tý (23-1h), Sửu (1-3h), Mão (5-7h), Ngọ (11-13h), Thân (15-17h), Dậu (17-19h)";
              } else if (chiDay === 5 || chiDay === 11) { // Sửu, Mùi
@@ -396,7 +402,7 @@
 
         const state = {
             currentDate: new Date(),
-            selectedDate: new Date(), // Mặc định là ngày hiện tại, VD: 15/8/2026
+            selectedDate: new Date(),
             
             // Getters
             get viewMonth() { return this.currentDate.getMonth() + 1; },
@@ -409,17 +415,14 @@
             selectDate(day, month, year) {
                 this.selectedDate = new Date(year, month - 1, day);
                 updateDetailPanel();
-                renderCalendar(); // Re-render để highlight
+                updateSelects(); // Cập nhật lại thanh search date
+                renderCalendar(); 
             },
 
             resetToToday() {
-                const today = new Date();
-                // Giả lập ngày hiện tại theo bối cảnh (15/08/2026) nếu muốn, 
-                // nhưng ở đây dùng new Date() thực tế của trình duyệt hoặc hardcode cho bối cảnh
-                // Vì bối cảnh prompt là 15/08/2026, ta nên set today theo đó
-                const contextToday = new Date(2026, 7, 15); 
-                this.currentDate = new Date(contextToday);
-                this.selectedDate = new Date(contextToday);
+                const today = new Date(); // Lấy đúng ngày hiện tại của máy tính
+                this.currentDate = new Date(today);
+                this.selectedDate = new Date(today);
                 updateSelects();
                 updateDetailPanel();
                 renderCalendar();
@@ -459,8 +462,6 @@
 
             // 2. Render các ngày của tháng hiện tại
             const today = new Date();
-            // Context today
-            const contextToday = new Date(2026, 7, 15); 
             
             for (let day = 1; day <= daysInMonth; day++) {
                 const cell = createDayCell(day, month, year, false);
@@ -472,13 +473,13 @@
                     cell.classList.add('selected-highlight');
                 }
                 
-                // Highlight ngày hôm nay (dựa trên context 15/08/2026)
-                if (contextToday.getDate() === day && 
-                    contextToday.getMonth() + 1 === month && 
-                    contextToday.getFullYear() === year) {
+                // Highlight ngày hôm nay
+                if (today.getDate() === day && 
+                    today.getMonth() + 1 === month && 
+                    today.getFullYear() === year) {
                     cell.classList.add('today-highlight');
                     // Ghi đè class nếu trùng ngày chọn
-                    if(state.selectedDate.getTime() === contextToday.getTime()) {
+                    if(state.selectedDate.getDate() === today.getDate() && state.selectedDate.getMonth() === today.getMonth() && state.selectedDate.getFullYear() === today.getFullYear()) {
                          cell.classList.replace('today-highlight', 'selected-highlight');
                          cell.classList.add('ring-2', 'ring-red-500');
                     }
@@ -552,7 +553,6 @@
                 // Nếu click vào ngày tháng khác, chuyển view sang tháng đó
                 if (solarMonth !== state.viewMonth) {
                     state.setMonthYear(solarMonth, solarYear);
-                    updateSelects();
                 }
                 state.selectDate(solarDay, solarMonth, solarYear);
             });
@@ -655,8 +655,8 @@
             }
 
             // Populate Year Select (từ 1900 đến 2100)
-            const currentYear = 2026; // Bối cảnh prompt
-            for (let i = currentYear - 50; i <= currentYear + 50; i++) {
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear - 100; i <= currentYear + 100; i++) {
                 const option = document.createElement('option');
                 option.value = i;
                 option.textContent = `Năm ${i}`;
@@ -666,12 +666,29 @@
             // Event Listeners
             elSelectMonth.addEventListener('change', (e) => {
                 state.setMonthYear(parseInt(e.target.value), state.viewYear);
+                updateSelects();
                 renderCalendar();
             });
 
             elSelectYear.addEventListener('change', (e) => {
                 state.setMonthYear(state.viewMonth, parseInt(e.target.value));
+                updateSelects();
                 renderCalendar();
+            });
+
+            // Sự kiện khi người dùng chọn ngày từ Ô Tìm Kiếm (Date Picker)
+            document.getElementById('search-date').addEventListener('change', (e) => {
+                const selectedDateVal = e.target.value;
+                if (selectedDateVal) {
+                    const [y, m, d] = selectedDateVal.split('-');
+                    const targetYear = parseInt(y);
+                    const targetMonth = parseInt(m);
+                    const targetDay = parseInt(d);
+
+                    // Chuyển view và chọn ngày
+                    state.setMonthYear(targetMonth, targetYear);
+                    state.selectDate(targetDay, targetMonth, targetYear);
+                }
             });
 
             document.getElementById('btn-prev-month').addEventListener('click', () => {
@@ -700,12 +717,22 @@
         function updateSelects() {
             elSelectMonth.value = state.viewMonth;
             elSelectYear.value = state.viewYear;
+            
+            // Cập nhật giá trị cho ô Search Date tương ứng với ngày đang chọn
+            const searchInput = document.getElementById('search-date');
+            if (searchInput) {
+                const y = state.selectedDate.getFullYear();
+                const m = String(state.selectedDate.getMonth() + 1).padStart(2, '0');
+                const d = String(state.selectedDate.getDate()).padStart(2, '0');
+                searchInput.value = `${y}-${m}-${d}`;
+            }
         }
 
         function initApp() {
-            // Đặt ngày theo bối cảnh trong hình ảnh/yêu cầu (15/08/2026)
-            state.currentDate = new Date(2026, 7, 15); // Tháng 7 là tháng 8 (0-indexed)
-            state.selectedDate = new Date(2026, 7, 15);
+            // Lấy ngày hiện tại tự động khi mở ứng dụng
+            const today = new Date();
+            state.currentDate = new Date(today);
+            state.selectedDate = new Date(today);
             
             initControls();
             updateSelects();
