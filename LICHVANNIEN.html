@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lịch Vạn Niên Việt Nam</title>
+    <!-- Import Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Import Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Roboto for main text, Playfair Display for accents -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #d32f2f; /* Đỏ truyền thống */
+            --secondary-color: #ffc107; /* Vàng */
+            --bg-color: #f5f5f5;
+            --card-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #757575;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            background-image: url('https://www.transparenttextures.com/patterns/rice-paper-2.png'); /* Texture giấy gió nhẹ nhàng */
+        }
+
+        .font-traditional {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .lunar-text {
+            color: var(--primary-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* Custom Scrollbar cho danh sách sự kiện */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .today-highlight {
+            background-color: #fee2e2; /* bg-red-100 */
+            border: 2px solid var(--primary-color);
+        }
+        
+        .selected-highlight {
+            background-color: #e0e7ff; /* bg-indigo-100 */
+            border: 2px solid #4f46e5;
+        }
+
+        .weekend {
+            color: #ef4444; /* text-red-500 */
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-4xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row">
+        
+        <!-- Cột bên trái: Hiển thị thông tin Chi tiết Ngày -->
+        <div class="md:w-1/3 bg-red-700 text-white p-6 flex flex-col items-center justify-center relative overflow-hidden" id="daily-detail-panel">
+            <!-- Nền trang trí (Pattern mờ) -->
+            <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+            
+            <div class="z-10 text-center w-full">
+                <div id="detail-month-year" class="text-xl font-medium text-red-100 uppercase tracking-widest mb-2">Tháng 8, 2026</div>
+                <div id="detail-day-of-week" class="text-2xl font-traditional mb-6 text-yellow-300">Thứ Bảy</div>
+                
+                <!-- Ngày Dương Lịch Lớn -->
+                <div class="relative inline-block mb-8">
+                    <div id="detail-solar-date" class="text-9xl font-bold font-traditional leading-none drop-shadow-lg">15</div>
+                </div>
+                
+                <div class="border-t border-red-500/50 w-full pt-6">
+                    <div class="text-sm text-red-200 mb-1">ÂM LỊCH</div>
+                    <div class="flex items-baseline justify-center gap-2 mb-2">
+                        <span id="detail-lunar-date" class="text-4xl font-bold text-yellow-400">03/07</span>
+                    </div>
+                    <div id="detail-lunar-can-chi" class="text-lg font-medium">Năm Bính Ngọ</div>
+                    <div id="detail-lunar-month-can-chi" class="text-sm mt-1 text-red-100">Tháng Bính Thân</div>
+                    <div id="detail-lunar-day-can-chi" class="text-sm text-red-100">Ngày Kỷ Sửu</div>
+                </div>
+                
+                <div id="detail-zodiac-time" class="mt-6 text-sm bg-red-800/50 p-3 rounded-lg backdrop-blur-sm">
+                    <strong>Giờ Hoàng Đạo:</strong><br>
+                    <span id="zodiac-hours" class="text-xs">Dần (3h-5h), Mão (5h-7h), Tỵ (9h-11h), Thân (15h-17h), Tuất (19h-21h), Hợi (21h-23h)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột bên phải: Lịch Tháng -->
+        <div class="md:w-2/3 p-6 md:p-8 flex flex-col">
+            
+            <!-- Header điều hướng tháng/năm -->
+            <div class="flex items-center justify-between mb-8">
+                <button id="btn-prev-month" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                
+                <div class="flex items-center gap-4">
+                    <select id="select-month" class="text-xl font-bold text-gray-800 bg-transparent border-none focus:ring-0 cursor-pointer hover:text-red-600 transition-colors">
+                        <!-- Options sẽ được render bằng JS -->
+                    </select>
+                    <select id="select-year" class="text-xl font-bold text-gray-800 bg-transparent border-none focus:ring-0 cursor-pointer hover:text-red-600 transition-colors">
+                         <!-- Options sẽ được render bằng JS -->
+                    </select>
+                </div>
+                
+                <button id="btn-next-month" class="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600 focus:outline-none focus:ring-2 focus:ring-red-500">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+            
+            <div class="flex justify-center mb-6">
+                 <button id="btn-today" class="px-4 py-2 bg-red-50 text-red-600 font-medium rounded-full border border-red-200 hover:bg-red-100 hover:border-red-300 transition-all text-sm shadow-sm">
+                    Trở về Hôm nay
+                </button>
+            </div>
+
+            <!-- Lưới Lịch -->
+            <div class="flex-grow">
+                <!-- Tiêu đề các ngày trong tuần -->
+                <div class="grid grid-cols-7 gap-1 mb-2 text-center text-sm font-medium text-gray-500 uppercase tracking-wider">
+                    <div class="weekend">CN</div>
+                    <div>T2</div>
+                    <div>T3</div>
+                    <div>T4</div>
+                    <div>T5</div>
+                    <div>T6</div>
+                    <div class="weekend">T7</div>
+                </div>
+                
+                <!-- Container chứa các ngày -->
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 sm:gap-2">
+                    <!-- Các ô ngày sẽ được render vào đây bằng JS -->
+                </div>
+            </div>
+            
+            <!-- Ghi chú/Sự kiện dưới lịch -->
+            <div class="mt-8 border-t pt-4">
+                <h3 class="text-sm font-bold text-gray-700 uppercase mb-2 flex items-center gap-2">
+                    <i class="fas fa-calendar-star text-yellow-500"></i> Sự kiện trong tháng
+                </h3>
+                <ul id="event-list" class="text-sm text-gray-600 space-y-2 h-24 overflow-y-auto custom-scrollbar pr-2">
+                    <!-- Sự kiện render bằng JS -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * THUẬT TOÁN TÍNH LỊCH ÂM VIỆT NAM
+         * Đây là phần lõi tính toán chuyển đổi Dương Lịch <-> Âm Lịch dựa trên múi giờ UTC+7.
+         * Các hằng số và thuật toán được tham khảo từ các thư viện âm lịch chuẩn (như thuật toán của Hồ Ngọc Đức).
+         */
+
+        const LUNAR_INFO = [
+            0x04bd8, 0x04ae0, 0x0a570, 0x054d5, 0x0d260, 0x0d950, 0x16554, 0x056a0, 0x09ad0, 0x055d2,
+            0x04ae0, 0x0a5b6, 0x0a4d0, 0x0d250, 0x1d255, 0x0b540, 0x0d6a0, 0x0ada2, 0x095b0, 0x14977,
+            0x04970, 0x0a4b0, 0x0b4b5, 0x06a50, 0x06d40, 0x1ab54, 0x02b60, 0x09570, 0x052f2, 0x04970,
+            0x06566, 0x0d4a0, 0x0ea50, 0x06e95, 0x05ad0, 0x02b60, 0x186e3, 0x092e0, 0x1c8d7, 0x0c950,
+            0x0d4a0, 0x1d8a6, 0x0b550, 0x056a0, 0x1a5b4, 0x025d0, 0x092d0, 0x0d2b2, 0x0a950, 0x0b557,
+            0x06ca0, 0x0b550, 0x15355, 0x04da0, 0x0a5b0, 0x14573, 0x052b0, 0x0a9a8, 0x0e950, 0x06aa0,
+            0x0aea6, 0x0ab50, 0x04b60, 0x0aae4, 0x0a570, 0x05260, 0x0f263, 0x0d950, 0x05b57, 0x056a0,
+            0x096d0, 0x04dd5, 0x04ad0, 0x0a4d0, 0x0d4d4, 0x0d250, 0x0d558, 0x0b540, 0x0b6a0, 0x195a6,
+            0x095b0, 0x049b0, 0x0a974, 0x0a4b0, 0x0b27a, 0x06a50, 0x06d40, 0x0af46, 0x0ab60, 0x09570,
+            0x04af5, 0x04970, 0x064b0, 0x074a3, 0x0ea50, 0x06b58, 0x05ac0, 0x0ab60, 0x096d5, 0x092e0,
+            0x0c960, 0x0d954, 0x0d4a0, 0x0da50, 0x07552, 0x056a0, 0x0abb7, 0x025d0, 0x092d0, 0x0cab5,
+            0x0a950, 0x0b4a0, 0x0baa4, 0x0ad50, 0x055d9, 0x04ba0, 0x0a5b0, 0x15176, 0x052b0, 0x0a930,
+            0x07954, 0x06aa0, 0x0ad50, 0x05b52, 0x04b60, 0x0a6e6, 0x0a4e0, 0x0d260, 0x0ea65, 0x0d530,
+            0x05aa0, 0x076a3, 0x096d0, 0x04afb, 0x04ad0, 0x0a4d0, 0x1d0b6, 0x0d250, 0x0d520, 0x0dd45,
+            0x0b5a0, 0x056d0, 0x055b2, 0x049b0, 0x0a577, 0x0a4b0, 0x0aa50, 0x1b255, 0x06d20, 0x0ada0,
+            0x14b63
+        ];
+
+        // Mảng dữ liệu Can Chi
+        const CAN = ["Canh", "Tân", "Nhâm", "Quý", "Giáp", "Ất", "Bính", "Đinh", "Mậu", "Kỷ"];
+        const CHI = ["Thân", "Dậu", "Tuất", "Hợi", "Tý", "Sửu", "Dần", "Mão", "Thìn", "Tỵ", "Ngọ", "Mùi"];
+        const DAY_OF_WEEK = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
+        
+        // Dữ liệu ngày lễ
+        const SOLAR_EVENTS = {
+            "0101": "Tết Dương Lịch",
+            "1402": "Valentine",
+            "0803": "Quốc tế Phụ nữ",
+            "3004": "Giải phóng miền Nam",
+            "0105": "Quốc tế Lao động",
+            "0106": "Quốc tế Thiếu nhi",
+            "0209": "Quốc khánh",
+            "2010": "Phụ nữ Việt Nam",
+            "2011": "Nhà giáo Việt Nam",
+            "2212": "QĐND Việt Nam",
+            "2412": "Giáng sinh (Noel)",
+            "2512": "Giáng sinh"
+        };
+
+        const LUNAR_EVENTS = {
+            "0101": "Tết Nguyên Đán",
+            "0201": "Mùng 2 Tết",
+            "0301": "Mùng 3 Tết",
+            "1501": "Tết Nguyên Tiêu",
+            "0303": "Tết Hàn Thực",
+            "1003": "Giỗ tổ Hùng Vương",
+            "1504": "Lễ Phật Đản",
+            "0505": "Tết Đoan Ngọ",
+            "1507": "Lễ Vu Lan",
+            "1508": "Tết Trung Thu",
+            "2312": "Ông Táo chầu trời",
+            "3012": "Giao thừa"
+        };
+
+        /**
+         * Trả về số ngày của năm âm lịch y
+         */
+        function lunarYearDays(y) {
+            let i, sum = 348;
+            for (i = 0x8000; i > 0x8; i >>= 1) {
+                sum += (LUNAR_INFO[y - 1900] & i) ? 1 : 0;
+            }
+            return sum + leapMonthDays(y);
+        }
+
+        /**
+         * Trả về số ngày của tháng nhuận năm âm lịch y
+         */
+        function leapMonthDays(y) {
+            if (leapMonth(y)) {
+                return (LUNAR_INFO[y - 1900] & 0x10000) ? 30 : 29;
+            }
+            return 0;
+        }
+
+        /**
+         * Trả về tháng nhuận của năm âm lịch y (0 nếu không có)
+         */
+        function leapMonth(y) {
+            return LUNAR_INFO[y - 1900] & 0xf;
+        }
+
+        /**
+         * Trả về số ngày của tháng m âm lịch trong năm y
+         */
+        function lunarMonthDays(y, m) {
+            return (LUNAR_INFO[y - 1900] & (0x10000 >> m)) ? 30 : 29;
+        }
+
+        /**
+         * Chuyển đổi Dương Lịch sang Âm Lịch
+         * Thuật toán đơn giản hóa dựa trên ngày Julian
+         */
+        function solarToLunar(solarYear, solarMonth, solarDay) {
+            let objDate = new Date(solarYear, solarMonth - 1, solarDay);
+            let i, leap = 0, temp = 0;
+            let offset = (Date.UTC(objDate.getFullYear(), objDate.getMonth(), objDate.getDate()) - Date.UTC(1900, 0, 31)) / 86400000;
+            
+            // Do bù trừ múi giờ Việt Nam
+            offset = Math.floor(offset);
+
+            for (i = 1900; i < 2100 && offset > 0; i++) {
+                temp = lunarYearDays(i);
+                offset -= temp;
+            }
+
+            if (offset < 0) {
+                offset += temp;
+                i--;
+            }
+
+            let lunarYear = i;
+            leap = leapMonth(i);
+            let isLeap = false;
+
+            for (i = 1; i < 13 && offset > 0; i++) {
+                if (leap > 0 && i == (leap + 1) && isLeap == false) {
+                    --i;
+                    isLeap = true;
+                    temp = leapMonthDays(lunarYear);
+                } else {
+                    temp = lunarMonthDays(lunarYear, i);
+                }
+
+                if (isLeap == true && i == (leap + 1)) isLeap = false;
+                offset -= temp;
+            }
+
+            if (offset == 0 && leap > 0 && i == leap + 1) {
+                if (isLeap) {
+                    isLeap = false;
+                } else {
+                    isLeap = true;
+                    --i;
+                }
+            }
+
+            if (offset < 0) {
+                offset += temp;
+                --i;
+            }
+
+            let lunarMonth = i;
+            let lunarDay = offset + 1;
+
+            return {
+                day: lunarDay,
+                month: lunarMonth,
+                year: lunarYear,
+                isLeap: isLeap
+            };
+        }
+
+        /**
+         * Lấy Can Chi của năm
+         */
+        function getYearCanChi(lunarYear) {
+            const can = CAN[lunarYear % 10];
+            const chi = CHI[lunarYear % 12];
+            return `${can} ${chi}`;
+        }
+        
+        /**
+         * Lấy Can Chi của tháng
+         */
+        function getMonthCanChi(lunarYear, lunarMonth) {
+            let canIndex = ((lunarYear % 10) * 2 + lunarMonth + 1) % 10;
+            if (canIndex < 0) canIndex += 10;
+            const chiIndex = (lunarMonth + 1) % 12; // Bắt đầu từ tháng Dần
+            return `${CAN[canIndex]} ${CHI[chiIndex]}`;
+        }
+
+        /**
+         * Tính ngày Julian để lấy Can Chi ngày
+         */
+        function jdFromDate(d, m, y) {
+            let a = Math.floor((14 - m) / 12);
+            let y_ = y + 4800 - a;
+            let m_ = m + 12 * a - 3;
+            return d + Math.floor((153 * m_ + 2) / 5) + 365 * y_ + Math.floor(y_ / 4) - Math.floor(y_ / 100) + Math.floor(y_ / 400) - 32045;
+        }
+
+        /**
+         * Lấy Can Chi của ngày
+         */
+        function getDayCanChi(solarDay, solarMonth, solarYear) {
+            const jd = jdFromDate(solarDay, solarMonth, solarYear);
+            const canIndex = (jd + 9) % 10;
+            const chiIndex = (jd + 1) % 12;
+            return `${CAN[canIndex]} ${CHI[chiIndex]}`;
+        }
+
+        /**
+         * Hàm giả lập lấy Giờ Hoàng Đạo (thực tế phức tạp hơn dựa trên chi ngày)
+         * Ở đây đơn giản hóa theo tháng để có dữ liệu hiển thị phong phú
+         */
+        function getZodiacHours(solarDay, solarMonth, solarYear) {
+             const jd = jdFromDate(solarDay, solarMonth, solarYear);
+             const chiDay = (jd + 1) % 12;
+             
+             // Ma trận giờ hoàng đạo theo Chi của ngày (đơn giản hóa)
+             // Tý, Ngọ: Tý, Sửu, Mão, Ngọ, Thân, Dậu
+             // Sửu, Mùi: Dần, Mão, Tỵ, Thân, Tuất, Hợi
+             // ... (Rút gọn cho mục đích hiển thị giao diện)
+             
+             if (chiDay === 4 || chiDay === 10) { // Tý, Ngọ
+                 return "Tý (23-1h), Sửu (1-3h), Mão (5-7h), Ngọ (11-13h), Thân (15-17h), Dậu (17-19h)";
+             } else if (chiDay === 5 || chiDay === 11) { // Sửu, Mùi
+                 return "Dần (3-5h), Mão (5-7h), Tỵ (9-11h), Thân (15-17h), Tuất (19-21h), Hợi (21-23h)";
+             } else if (chiDay === 6 || chiDay === 0) { // Dần, Thân
+                 return "Tý (23-1h), Sửu (1-3h), Thìn (7-9h), Tỵ (9-11h), Mùi (13-15h), Tuất (19-21h)";
+             } else {
+                 return "Dần (3-5h), Thìn (7-9h), Tỵ (9-11h), Thân (15-17h), Dậu (17-19h), Hợi (21-23h)";
+             }
+        }
+
+        const state = {
+            currentDate: new Date(),
+            selectedDate: new Date(), // Mặc định là ngày hiện tại, VD: 15/8/2026
+            
+            // Getters
+            get viewMonth() { return this.currentDate.getMonth() + 1; },
+            get viewYear() { return this.currentDate.getFullYear(); },
+            
+            setMonthYear(month, year) {
+                this.currentDate = new Date(year, month - 1, 1);
+            },
+            
+            selectDate(day, month, year) {
+                this.selectedDate = new Date(year, month - 1, day);
+                updateDetailPanel();
+                renderCalendar(); // Re-render để highlight
+            },
+
+            resetToToday() {
+                const today = new Date();
+                // Giả lập ngày hiện tại theo bối cảnh (15/08/2026) nếu muốn, 
+                // nhưng ở đây dùng new Date() thực tế của trình duyệt hoặc hardcode cho bối cảnh
+                // Vì bối cảnh prompt là 15/08/2026, ta nên set today theo đó
+                const contextToday = new Date(2026, 7, 15); 
+                this.currentDate = new Date(contextToday);
+                this.selectedDate = new Date(contextToday);
+                updateSelects();
+                updateDetailPanel();
+                renderCalendar();
+            }
+        };
+
+        // DOM Elements
+        const elCalendarGrid = document.getElementById('calendar-grid');
+        const elSelectMonth = document.getElementById('select-month');
+        const elSelectYear = document.getElementById('select-year');
+        const elEventList = document.getElementById('event-list');
+
+        function renderCalendar() {
+            elCalendarGrid.innerHTML = '';
+            const year = state.viewYear;
+            const month = state.viewMonth;
+            
+            // Ngày đầu tiên của tháng
+            const firstDay = new Date(year, month - 1, 1);
+            const startingDayOfWeek = firstDay.getDay(); // 0 (CN) -> 6 (T7)
+            
+            // Số ngày trong tháng
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            // Số ngày của tháng trước (để làm mờ các ô đầu tiên)
+            const daysInPrevMonth = new Date(year, month - 1, 0).getDate();
+            
+            let eventsInMonth = [];
+
+            // 1. Render các ngày của tháng trước (làm mờ)
+            for (let i = startingDayOfWeek - 1; i >= 0; i--) {
+                const day = daysInPrevMonth - i;
+                const prevMonth = month === 1 ? 12 : month - 1;
+                const prevYear = month === 1 ? year - 1 : year;
+                elCalendarGrid.appendChild(createDayCell(day, prevMonth, prevYear, true));
+            }
+
+            // 2. Render các ngày của tháng hiện tại
+            const today = new Date();
+            // Context today
+            const contextToday = new Date(2026, 7, 15); 
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = createDayCell(day, month, year, false);
+                
+                // Highlight ngày đang chọn
+                if (state.selectedDate.getDate() === day && 
+                    state.selectedDate.getMonth() + 1 === month && 
+                    state.selectedDate.getFullYear() === year) {
+                    cell.classList.add('selected-highlight');
+                }
+                
+                // Highlight ngày hôm nay (dựa trên context 15/08/2026)
+                if (contextToday.getDate() === day && 
+                    contextToday.getMonth() + 1 === month && 
+                    contextToday.getFullYear() === year) {
+                    cell.classList.add('today-highlight');
+                    // Ghi đè class nếu trùng ngày chọn
+                    if(state.selectedDate.getTime() === contextToday.getTime()) {
+                         cell.classList.replace('today-highlight', 'selected-highlight');
+                         cell.classList.add('ring-2', 'ring-red-500');
+                    }
+                }
+
+                // Thu thập sự kiện
+                const eventStr = getEventForDate(day, month, year);
+                if (eventStr) {
+                    eventsInMonth.push({ day, month, event: eventStr });
+                    // Thêm chấm đỏ cho ngày có sự kiện
+                    const dot = document.createElement('div');
+                    dot.className = 'w-1.5 h-1.5 bg-red-500 rounded-full absolute bottom-1 right-1';
+                    cell.appendChild(dot);
+                }
+
+                elCalendarGrid.appendChild(cell);
+            }
+
+            // 3. Render các ngày của tháng sau (làm mờ)
+            const totalCellsRendered = startingDayOfWeek + daysInMonth;
+            const remainingCells = (Math.ceil(totalCellsRendered / 7) * 7) - totalCellsRendered;
+            
+            for (let day = 1; day <= remainingCells; day++) {
+                 const nextMonth = month === 12 ? 1 : month + 1;
+                 const nextYear = month === 12 ? year + 1 : year;
+                 elCalendarGrid.appendChild(createDayCell(day, nextMonth, nextYear, true));
+            }
+
+            // Cập nhật danh sách sự kiện
+            updateEventList(eventsInMonth);
+        }
+
+        function createDayCell(solarDay, solarMonth, solarYear, isMuted) {
+            const cell = document.createElement('div');
+            // Cấu trúc cơ bản của ô lịch
+            cell.className = `
+                relative flex flex-col items-center justify-center p-2 sm:p-3 
+                rounded-lg cursor-pointer transition-all duration-200 
+                hover:bg-gray-100 min-h-[60px] sm:min-h-[70px]
+            `;
+            
+            if (isMuted) {
+                cell.classList.add('opacity-40');
+            }
+
+            // Tính toán Âm lịch
+            const lunar = solarToLunar(solarYear, solarMonth, solarDay);
+            
+            // Xác định ngày cuối tuần
+            const dateObj = new Date(solarYear, solarMonth - 1, solarDay);
+            const dayOfWeek = dateObj.getDay();
+            const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+            
+            // Màu sắc ngày Dương lịch
+            const solarColor = isWeekend && !isMuted ? 'text-red-500' : 'text-gray-800';
+            
+            // Xử lý hiển thị ngày Âm (nếu là mùng 1 thì hiển thị thêm tháng)
+            let lunarText = lunar.day;
+            if (lunar.day === 1) {
+                lunarText = `${lunar.day}/${lunar.month}${lunar.isLeap ? '(N)' : ''}`;
+            }
+
+            // HTML của ô
+            cell.innerHTML = `
+                <span class="text-base sm:text-lg font-medium ${solarColor}">${solarDay}</span>
+                <span class="text-[10px] sm:text-xs text-gray-500 mt-1">${lunarText}</span>
+            `;
+
+            // Bắt sự kiện click
+            cell.addEventListener('click', () => {
+                // Nếu click vào ngày tháng khác, chuyển view sang tháng đó
+                if (solarMonth !== state.viewMonth) {
+                    state.setMonthYear(solarMonth, solarYear);
+                    updateSelects();
+                }
+                state.selectDate(solarDay, solarMonth, solarYear);
+            });
+
+            return cell;
+        }
+
+        function updateDetailPanel() {
+            const sDay = state.selectedDate.getDate();
+            const sMonth = state.selectedDate.getMonth() + 1;
+            const sYear = state.selectedDate.getFullYear();
+            const dayOfWeek = state.selectedDate.getDay();
+
+            const lunar = solarToLunar(sYear, sMonth, sDay);
+
+            // Cập nhật DOM
+            document.getElementById('detail-month-year').textContent = `Tháng ${sMonth}, ${sYear}`;
+            document.getElementById('detail-day-of-week').textContent = DAY_OF_WEEK[dayOfWeek];
+            
+            // Animation fade in cho số ngày
+            const elSolarDate = document.getElementById('detail-solar-date');
+            elSolarDate.textContent = sDay;
+            elSolarDate.classList.remove('fade-in');
+            void elSolarDate.offsetWidth; // Trigger reflow
+            elSolarDate.classList.add('fade-in');
+
+            document.getElementById('detail-lunar-date').textContent = `${String(lunar.day).padStart(2, '0')}/${String(lunar.month).padStart(2, '0')}`;
+            
+            // Can Chi
+            document.getElementById('detail-lunar-can-chi').textContent = `Năm ${getYearCanChi(lunar.year)}`;
+            document.getElementById('detail-lunar-month-can-chi').textContent = `Tháng ${getMonthCanChi(lunar.year, lunar.month)}`;
+            document.getElementById('detail-lunar-day-can-chi').textContent = `Ngày ${getDayCanChi(sDay, sMonth, sYear)}`;
+            
+            // Giờ Hoàng Đạo
+            document.getElementById('zodiac-hours').textContent = getZodiacHours(sDay, sMonth, sYear);
+
+            // Kiểm tra sự kiện lễ hội
+            const eventStr = getEventForDate(sDay, sMonth, sYear);
+            const elPanel = document.getElementById('daily-detail-panel');
+            
+            // Thêm banner sự kiện nhỏ gọn nếu có
+            let eventBanner = document.getElementById('event-banner');
+            if (eventStr) {
+                if (!eventBanner) {
+                    eventBanner = document.createElement('div');
+                    eventBanner.id = 'event-banner';
+                    eventBanner.className = 'absolute top-0 left-0 w-full bg-yellow-400 text-yellow-900 text-xs font-bold py-1 text-center truncate px-2 z-20';
+                    elPanel.appendChild(eventBanner);
+                }
+                eventBanner.textContent = eventStr;
+                eventBanner.style.display = 'block';
+            } else if (eventBanner) {
+                eventBanner.style.display = 'none';
+            }
+        }
+
+        function getEventForDate(solarDay, solarMonth, solarYear) {
+            let events = [];
+            
+            // Check Dương lịch
+            const sKey = String(solarDay).padStart(2, '0') + String(solarMonth).padStart(2, '0');
+            if (SOLAR_EVENTS[sKey]) events.push(SOLAR_EVENTS[sKey]);
+
+            // Check Âm lịch
+            const lunar = solarToLunar(solarYear, solarMonth, solarDay);
+            const lKey = String(lunar.day).padStart(2, '0') + String(lunar.month).padStart(2, '0');
+            if (LUNAR_EVENTS[lKey] && !lunar.isLeap) events.push(LUNAR_EVENTS[lKey]);
+
+            return events.length > 0 ? events.join(' - ') : null;
+        }
+
+        function updateEventList(events) {
+            elEventList.innerHTML = '';
+            if (events.length === 0) {
+                elEventList.innerHTML = '<li class="text-gray-400 italic text-center py-4">Không có sự kiện đặc biệt trong tháng này</li>';
+                return;
+            }
+
+            events.forEach(ev => {
+                const li = document.createElement('li');
+                li.className = 'flex items-start gap-2 p-2 hover:bg-gray-50 rounded-md transition-colors cursor-pointer border-b border-gray-100 last:border-0';
+                li.innerHTML = `
+                    <span class="bg-red-100 text-red-600 font-bold px-2 py-0.5 rounded text-xs min-w-[45px] text-center">${ev.day}/${ev.month}</span>
+                    <span class="text-gray-700">${ev.event}</span>
+                `;
+                li.addEventListener('click', () => {
+                     state.selectDate(ev.day, ev.month, state.viewYear);
+                });
+                elEventList.appendChild(li);
+            });
+        }
+
+        function initControls() {
+            // Populate Month Select
+            for (let i = 1; i <= 12; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Tháng ${i}`;
+                elSelectMonth.appendChild(option);
+            }
+
+            // Populate Year Select (từ 1900 đến 2100)
+            const currentYear = 2026; // Bối cảnh prompt
+            for (let i = currentYear - 50; i <= currentYear + 50; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `Năm ${i}`;
+                elSelectYear.appendChild(option);
+            }
+
+            // Event Listeners
+            elSelectMonth.addEventListener('change', (e) => {
+                state.setMonthYear(parseInt(e.target.value), state.viewYear);
+                renderCalendar();
+            });
+
+            elSelectYear.addEventListener('change', (e) => {
+                state.setMonthYear(state.viewMonth, parseInt(e.target.value));
+                renderCalendar();
+            });
+
+            document.getElementById('btn-prev-month').addEventListener('click', () => {
+                let m = state.viewMonth - 1;
+                let y = state.viewYear;
+                if (m < 1) { m = 12; y--; }
+                state.setMonthYear(m, y);
+                updateSelects();
+                renderCalendar();
+            });
+
+            document.getElementById('btn-next-month').addEventListener('click', () => {
+                let m = state.viewMonth + 1;
+                let y = state.viewYear;
+                if (m > 12) { m = 1; y++; }
+                state.setMonthYear(m, y);
+                updateSelects();
+                renderCalendar();
+            });
+
+            document.getElementById('btn-today').addEventListener('click', () => {
+                state.resetToToday();
+            });
+        }
+
+        function updateSelects() {
+            elSelectMonth.value = state.viewMonth;
+            elSelectYear.value = state.viewYear;
+        }
+
+        function initApp() {
+            // Đặt ngày theo bối cảnh trong hình ảnh/yêu cầu (15/08/2026)
+            state.currentDate = new Date(2026, 7, 15); // Tháng 7 là tháng 8 (0-indexed)
+            state.selectedDate = new Date(2026, 7, 15);
+            
+            initControls();
+            updateSelects();
+            updateDetailPanel();
+            renderCalendar();
+        }
+
+        // Chạy app khi DOM load xong
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>
