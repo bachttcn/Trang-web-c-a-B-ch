@@ -138,18 +138,46 @@
             </div>
             
             <!-- Khu vực Công cụ: Nút Hôm nay & Ô Tìm kiếm Ngày -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6 bg-gray-50 p-3 rounded-xl border border-gray-100">
-                <button id="btn-today" class="flex-shrink-0 px-4 py-2 bg-white text-red-600 font-medium rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all text-sm shadow-sm flex items-center gap-2">
-                    <i class="fas fa-calendar-day"></i> Trở về Hôm nay
-                </button>
-                
-                <div class="flex-grow w-full sm:w-auto relative flex items-center">
+            <div class="flex flex-col mb-6 bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-100 gap-4">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <button id="btn-today" class="flex-shrink-0 px-4 py-2 bg-white text-red-600 font-medium rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all text-sm shadow-sm flex items-center gap-2">
+                        <i class="fas fa-calendar-day"></i> Trở về Hôm nay
+                    </button>
+                    
+                    <!-- Toggle Dương/Âm -->
+                    <div class="flex bg-gray-200 p-1 rounded-lg">
+                        <button id="tab-solar" class="px-4 py-1.5 text-sm font-medium rounded-md bg-white text-red-600 shadow-sm transition-all">Dương Lịch</button>
+                        <button id="tab-lunar" class="px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-800 transition-all">Âm Lịch</button>
+                    </div>
+                </div>
+
+                <!-- Input Dương Lịch -->
+                <div id="search-solar-container" class="relative w-full flex items-center">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
-                    <input type="text" id="search-date" placeholder="dd/mm/yyyy" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-700 bg-white shadow-sm transition-all hover:border-gray-400 cursor-text" title="Nhập hoặc chọn ngày cần tra cứu (VD: 15/08/2026)">
+                    <input type="text" id="search-date" placeholder="Tìm ngày Dương (dd/mm/yyyy)" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-700 bg-white shadow-sm transition-all hover:border-gray-400 cursor-text" title="Nhập hoặc chọn ngày cần tra cứu (VD: 15/08/2026)">
                     <span class="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 pointer-events-none hidden sm:block"><i class="far fa-calendar-alt"></i></span>
                 </div>
+
+                <!-- Input Âm Lịch -->
+                <div id="search-lunar-container" class="hidden w-full flex flex-wrap sm:flex-nowrap gap-2 items-center bg-white p-2 rounded-lg border border-gray-300 shadow-sm">
+                    <input type="number" id="lunar-day" placeholder="Ngày" class="flex-1 min-w-[60px] px-3 py-2 border-b-2 sm:border-b-0 sm:border-r border-gray-100 sm:border-gray-200 text-sm focus:outline-none text-center" min="1" max="30">
+                    <input type="number" id="lunar-month" placeholder="Tháng" class="flex-1 min-w-[60px] px-3 py-2 border-b-2 sm:border-b-0 sm:border-r border-gray-100 sm:border-gray-200 text-sm focus:outline-none text-center" min="1" max="12">
+                    <input type="number" id="lunar-year" placeholder="Năm" class="flex-1 min-w-[70px] px-3 py-2 sm:border-r border-gray-200 text-sm focus:outline-none text-center">
+                    
+                    <label class="flex items-center gap-1 text-sm text-gray-700 cursor-pointer whitespace-nowrap px-2 py-2">
+                        <input type="checkbox" id="lunar-leap" class="w-4 h-4 text-red-600 focus:ring-red-500 border-gray-300 rounded">
+                        Nhuận
+                    </label>
+                    
+                    <button id="btn-search-lunar" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center justify-center gap-2 mt-2 sm:mt-0">
+                        <i class="fas fa-search"></i> Tìm
+                    </button>
+                </div>
+                
+                <!-- Thông báo lỗi (nếu nhập sai) -->
+                <div id="lunar-error" class="hidden text-xs text-red-500 font-medium px-1">Ngày Âm Lịch không tồn tại (Có thể bạn chọn sai tháng Nhuận hoặc tháng đó bị thiếu ngày 30).</div>
             </div>
 
             <!-- Lưới Lịch -->
@@ -357,6 +385,32 @@
         function solarToLunar(solarYear, solarMonth, solarDay) {
             if (solarYear < 1) return { day: '--', month: '--', year: solarYear, isLeap: false };
             return solarToLunarFull(solarDay, solarMonth, solarYear, 7.0);
+        }
+
+        // Chuyển Âm lịch -> Dương lịch (Dựa trên quét tuần tự vì thuật toán thuận rất chuẩn xác)
+        function lunarToSolar(lunarDay, lunarMonth, lunarYear, isLeapMonth) {
+            if (lunarYear < 1 || lunarYear > 9999 || lunarDay < 1 || lunarDay > 30 || lunarMonth < 1 || lunarMonth > 12) return null;
+            
+            // Quét trong khoảng 1 năm dương lịch xung quanh năm âm lịch đó
+            let startJd = jdFromDate(1, 1, lunarYear) - 60;
+            let endJd = jdFromDate(31, 12, lunarYear) + 60; 
+
+            for (let jd = startJd; jd <= endJd; jd++) {
+                let solarDate = jdToDate(jd); // [dd, mm, yy]
+                let sDay = solarDate[0];
+                let sMonth = solarDate[1];
+                let sYear = solarDate[2];
+
+                let lunarResult = solarToLunar(sYear, sMonth, sDay);
+
+                if (lunarResult.day === lunarDay && 
+                    lunarResult.month === lunarMonth && 
+                    lunarResult.year === lunarYear && 
+                    lunarResult.isLeap === isLeapMonth) {
+                    return { day: sDay, month: sMonth, year: sYear };
+                }
+            }
+            return null; // Trả về null nếu không tìm thấy (ví dụ nhập 30 tháng 2 âm thiếu)
         }
 
         function getYearCanChi(lunarYear) {
@@ -703,6 +757,68 @@
 
             document.getElementById('btn-today').addEventListener('click', () => {
                 state.resetToToday();
+            });
+
+            // Logic Tab Chuyển đổi Dương / Âm
+            const tabSolar = document.getElementById('tab-solar');
+            const tabLunar = document.getElementById('tab-lunar');
+            const containerSolar = document.getElementById('search-solar-container');
+            const containerLunar = document.getElementById('search-lunar-container');
+            const lunarError = document.getElementById('lunar-error');
+
+            tabSolar.addEventListener('click', () => {
+                tabSolar.className = 'px-4 py-1.5 text-sm font-medium rounded-md bg-white text-red-600 shadow-sm transition-all';
+                tabLunar.className = 'px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-800 transition-all';
+                containerSolar.classList.remove('hidden');
+                containerLunar.classList.add('hidden');
+                containerLunar.classList.remove('flex');
+                lunarError.classList.add('hidden');
+            });
+
+            tabLunar.addEventListener('click', () => {
+                tabLunar.className = 'px-4 py-1.5 text-sm font-medium rounded-md bg-white text-red-600 shadow-sm transition-all';
+                tabSolar.className = 'px-4 py-1.5 text-sm font-medium rounded-md text-gray-500 hover:text-gray-800 transition-all';
+                containerLunar.classList.remove('hidden');
+                containerLunar.classList.add('flex');
+                containerSolar.classList.add('hidden');
+                
+                // Điền sẵn ngày âm hiện tại đang chọn lên ô tìm kiếm cho tiện
+                const sDay = state.selectedDate.getDate();
+                const sMonth = state.selectedDate.getMonth() + 1;
+                const sYear = state.selectedDate.getFullYear();
+                const currLunar = solarToLunar(sYear, sMonth, sDay);
+                
+                if(currLunar.day !== '--') {
+                    document.getElementById('lunar-day').value = currLunar.day;
+                    document.getElementById('lunar-month').value = currLunar.month;
+                    document.getElementById('lunar-year').value = currLunar.year;
+                    document.getElementById('lunar-leap').checked = currLunar.isLeap;
+                }
+            });
+
+            // Xử lý nút tìm kiếm & chuyển đổi ngày Âm
+            document.getElementById('btn-search-lunar').addEventListener('click', () => {
+                const d = parseInt(document.getElementById('lunar-day').value);
+                const m = parseInt(document.getElementById('lunar-month').value);
+                const y = parseInt(document.getElementById('lunar-year').value);
+                const isLeap = document.getElementById('lunar-leap').checked;
+
+                if (isNaN(d) || isNaN(m) || isNaN(y)) {
+                    lunarError.textContent = "Vui lòng nhập đầy đủ Ngày, Tháng, Năm Âm Lịch!";
+                    lunarError.classList.remove('hidden');
+                    return;
+                }
+
+                const solarResult = lunarToSolar(d, m, y, isLeap);
+                
+                if (solarResult) {
+                    lunarError.classList.add('hidden');
+                    state.setMonthYear(solarResult.month, solarResult.year);
+                    state.selectDate(solarResult.day, solarResult.month, solarResult.year);
+                } else {
+                    lunarError.textContent = "Ngày Âm Lịch không tồn tại (Có thể bạn chọn sai tháng Nhuận hoặc tháng đó bị thiếu ngày 30).";
+                    lunarError.classList.remove('hidden');
+                }
             });
         }
 
