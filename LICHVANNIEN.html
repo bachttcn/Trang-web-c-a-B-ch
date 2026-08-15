@@ -266,94 +266,97 @@
             return [dd, mm, yy];
         }
 
-        // Tính kinh độ Mặt Trời (đơn giản hóa)
-        function sunLongitude(jdn) {
-            let T = (jdn - 2451545.0) / 36525;
+        function getNewMoonDay(k, timeZone) {
+            let T = k / 1236.85;
+            let T2 = T * T;
+            let T3 = T2 * T;
+            let dr = PI / 180;
+            let Jd1 = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3 
+                    + 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+            let M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+            let Mprime = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+            let F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+            let C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * M * dr);
+            let C2 = -0.4068 * Math.sin(Mprime * dr) + 0.0161 * Math.sin(2 * Mprime * dr);
+            let C3 = -0.0004 * Math.sin(2 * F * dr);
+            let C4 = 0.0104 * Math.sin(2 * Mprime * dr) - 0.0051 * Math.sin((M + Mprime) * dr);
+            let C5 = -0.0074 * Math.sin((M - Mprime) * dr) + 0.0004 * Math.sin((2 * F + M) * dr);
+            let C6 = -0.0004 * Math.sin((2 * F - M) * dr) - 0.0006 * Math.sin((2 * F + Mprime) * dr);
+            let C7 = 0.001 * Math.sin((2 * F - Mprime) * dr) + 0.0005 * Math.sin((M + 2 * Mprime) * dr);
+            let dJd = C1 + C2 + C3 + C4 + C5 + C6 + C7;
+            return INT(Jd1 + dJd + 0.5 + timeZone / 24.0);
+        }
+
+        function getSunLongitude(dayNumber, timeZone) {
+            let T = (dayNumber - 0.5 - timeZone / 24.0 - 2451545.0) / 36525;
             let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
             let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
-            let e = 0.016708634 - 0.000042037 * T - 0.0000001267 * T * T;
             let C = (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(M * PI / 180) 
                   + (0.019993 - 0.000101 * T) * Math.sin(2 * M * PI / 180) 
                   + 0.000289 * Math.sin(3 * M * PI / 180);
             let sunLon = L0 + C;
-            sunLon = sunLon % 360;
-            if (sunLon < 0) sunLon += 360;
+            sunLon = sunLon - 360.0 * INT(sunLon / 360.0);
             return sunLon;
         }
 
-        // Tính điểm sóc (New Moon) gần nhất
-        function getNewMoonDay(timeZone, yy, mm, dd) {
-             // Hàm xấp xỉ điểm sóc. Để chính xác tuyệt đối từ năm 1-9999 cần thư viện VSOP87,
-             // nhưng đây là bản xấp xỉ tốt đủ dùng cho web
-             const jd = jdFromDate(dd, mm, yy);
-             let T = (jd - 2451545.0) / 36525;
-             let D = jd - 2451545.0;
-             // Tính xấp xỉ
-             let NM = 2451550.09766 + 29.530588861 * INT(D / 29.530588861);
-             return INT(NM + timeZone / 24.0 + 0.5); // Đơn giản hóa, thực tế phức tạp hơn
+        function getLunarMonth11(yy, timeZone) {
+            let off = jdFromDate(31, 12, yy) - 2415021.076998695;
+            let k = INT(off / 29.530588853);
+            let nm = getNewMoonDay(k, timeZone);
+            let sunLon = getSunLongitude(nm, timeZone);
+            if (sunLon >= 270) nm = getNewMoonDay(k - 1, timeZone);
+            return nm;
         }
 
-        /**
-         * Chuyển Dương Lịch sang Âm Lịch (Bản dùng xấp xỉ chu kỳ để hỗ trợ dải rộng)
-         * Lưu ý: Do tính toán thiên văn rất phức tạp, bản dưới đây dùng thuật toán xấp xỉ
-         * để đảm bảo không bị crash khi nhập năm quá lớn hoặc quá nhỏ.
-         */
-        function solarToLunar(solarYear, solarMonth, solarDay) {
-            // Giới hạn năm an toàn cho thuật toán JS cơ bản
-            if (solarYear < 1) return { day: '--', month: '--', year: solarYear, isLeap: false };
-            
-            // THUẬT TOÁN XẤP XỈ NHANH CHU KỲ (Dùng cho ứng dụng client-side mở rộng)
-            // Không chính xác tuyệt đối như Lịch vạn niên nhà nước, nhưng chạy được vô hạn
-            
-            let jd = jdFromDate(solarDay, solarMonth, solarYear);
-            
-            // Xấp xỉ ngày bắt đầu năm âm lịch (thường vào cuối T1 hoặc tháng 2)
-            let baseJd = jdFromDate(1, 1, solarYear);
-            let daysFromStart = jd - baseJd;
-            
-            // Xấp xỉ tháng âm (1 chu kỳ ~ 29.53 ngày)
-            // Ngày tết âm lịch thường dao động từ 21/1 đến 20/2 dương lịch.
-            // Giả lập ngày tết ở Julian Day xấp xỉ
-            let tetJd = jdFromDate(5, 2, solarYear); // Lấy trung bình
-            let offset = jd - tetJd + 29; // Căn chỉnh để ra mùng 1
-            
-            let lunarYear = solarYear;
-            let lunarMonth, lunarDay;
-            let isLeap = false;
-            
-            if (offset < 0) {
-                lunarYear--;
-                let prevTetJd = jdFromDate(5, 2, lunarYear);
-                offset = jd - prevTetJd + 29;
+        function getLeapMonthOffset(a11, timeZone) {
+            let k, last, arc, i, leapMonth = 0, nm;
+            let k11 = INT((a11 - 2415021.076998695) / 29.530588853) + 0.5;
+            last = 0;
+            let b11 = getLunarMonth11(jdToDate(a11)[2] + 1, timeZone);
+            arc = getSunLongitude(getNewMoonDay(k11, timeZone), timeZone);
+            for (i = 1; i <= 14; i++) {
+                nm = getNewMoonDay(k11 + i, timeZone);
+                let arc1 = getSunLongitude(nm, timeZone);
+                if (arc <= last && arc1 > last) {
+                    last += 30;
+                    if (last == 360) last = 0;
+                } else if (leapMonth == 0) {
+                    leapMonth = i;
+                }
+                arc = arc1;
+                if (nm >= b11) break;
             }
-            
-            lunarMonth = INT(offset / 29.53059) + 1;
-            lunarDay = INT(offset % 29.53059) + 1;
-            
-            // Giới hạn tháng
-            if (lunarMonth > 12) {
-                // Xử lý nhuận giả lập
-                if(lunarMonth == 13) {
-                     lunarMonth = 12; // Hoặc tháng nào đó
-                     isLeap = true;
-                } else {
-                     lunarMonth = lunarMonth % 12;
-                     lunarYear++;
+            return leapMonth;
+        }
+
+        function solarToLunarFull(dd, mm, yy, timeZone) {
+            let dayNumber = jdFromDate(dd, mm, yy);
+            let k = INT((dayNumber - 2415021.076998695) / 29.530588853);
+            let monthStart = getNewMoonDay(k + 1, timeZone);
+            if (monthStart > dayNumber) monthStart = getNewMoonDay(k, timeZone);
+            let a11 = getLunarMonth11(yy, timeZone);
+            let b11 = a11;
+            if (a11 >= monthStart) {
+                a11 = getLunarMonth11(yy - 1, timeZone);
+                if (a11 >= monthStart) a11 = getLunarMonth11(yy - 2, timeZone);
+            }
+            let lunarDay = dayNumber - monthStart + 1;
+            let diff = INT((monthStart - a11) / 29);
+            let lunarYear = yy;
+            let lunarMonth = diff + 11;
+            if (b11 - a11 > 365) {
+                let leapMonthDiff = getLeapMonthOffset(a11, timeZone);
+                if (diff >= leapMonthDiff) lunarMonth = diff + 10;
+                if (diff == leapMonthDiff) {
+                    return { day: lunarDay, month: (lunarMonth > 12 ? lunarMonth - 12 : lunarMonth), year: (lunarMonth > 12 ? lunarYear : lunarYear - 1), isLeap: true };
                 }
             }
+            return { day: lunarDay, month: (lunarMonth > 12 ? lunarMonth - 12 : lunarMonth), year: (lunarMonth > 12 ? lunarYear : lunarYear - 1), isLeap: false };
+        }
 
-            // --- KẾT THÚC PHẦN XẤP XỈ ---
-            
-            // Để hiển thị đẹp, nếu là ngày hiện tại hoặc gần, mình cố gắng fix lại cho đúng
-            // Thực tế: Để đúng 100% cần file data.js ~1MB chứa thông tin thiên văn
-            // Ở đây ta dùng thuật toán xấp xỉ + Can Chi vẫn tính đúng theo Julian Day
-            
-            return {
-                day: lunarDay > 30 ? 30 : lunarDay,
-                month: lunarMonth,
-                year: lunarYear,
-                isLeap: isLeap
-            };
+        function solarToLunar(solarYear, solarMonth, solarDay) {
+            if (solarYear < 1) return { day: '--', month: '--', year: solarYear, isLeap: false };
+            return solarToLunarFull(solarDay, solarMonth, solarYear, 7.0);
         }
 
         function getYearCanChi(lunarYear) {
