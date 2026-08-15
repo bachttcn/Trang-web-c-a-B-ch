@@ -6,6 +6,25 @@
     <title>Lịch Vạn Niên Việt Nam</title>
     <!-- Import Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Cấu hình màu cho Tool Năm Nhuận -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lunar: {
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            gold: '#fbbf24',
+                            light: '#f8fafc'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <!-- Import Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -79,6 +98,22 @@
         .weekend {
             color: #ef4444; /* text-red-500 */
         }
+
+        /* Styles cho tool năm nhuận */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Ẩn mũi tên trong input type number của tool */
+        .no-spin::-webkit-inner-spin-button, 
+        .no-spin::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -140,9 +175,16 @@
             <!-- Khu vực Công cụ: Nút Hôm nay & Ô Tìm kiếm Ngày -->
             <div class="flex flex-col mb-6 bg-gray-50 p-3 sm:p-4 rounded-xl border border-gray-100 gap-4">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                    <button id="btn-today" class="flex-shrink-0 px-4 py-2 bg-white text-red-600 font-medium rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all text-sm shadow-sm flex items-center gap-2">
-                        <i class="fas fa-calendar-day"></i> Trở về Hôm nay
-                    </button>
+                    <div class="flex gap-2 w-full sm:w-auto">
+                        <button id="btn-today" class="flex-1 sm:flex-none px-4 py-2 bg-white text-red-600 font-medium rounded-lg border border-red-200 hover:bg-red-50 hover:border-red-300 transition-all text-sm shadow-sm flex items-center justify-center gap-2">
+                            <i class="fas fa-calendar-day"></i> Trở về Hôm nay
+                        </button>
+                        
+                        <!-- Nút Mở Tool Máy Tính Năm Nhuận -->
+                        <button id="btn-open-leap-calc" class="flex-1 sm:flex-none px-4 py-2 bg-slate-800 text-yellow-400 font-medium rounded-lg border border-slate-700 hover:bg-slate-700 transition-all text-sm shadow-sm flex items-center justify-center gap-2" title="Tính năm nhuận Âm Lịch">
+                            <i class="fa-solid fa-calculator"></i> Tính Năm Nhuận
+                        </button>
+                    </div>
                     
                     <!-- Toggle Dương/Âm -->
                     <div class="flex bg-gray-200 p-1 rounded-lg">
@@ -210,6 +252,71 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL MÁY TÍNH NĂM NHUẬN ÂM LỊCH -->
+    <div id="leap-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl bg-lunar-dark rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] flex flex-col font-[Inter]">
+            <!-- Nút đóng -->
+            <button id="btn-close-leap-calc" class="absolute top-4 right-4 w-10 h-10 bg-slate-800 rounded-full text-gray-400 hover:text-white hover:bg-red-500 transition-colors z-10 flex items-center justify-center">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+            
+            <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar text-f8fafc">
+                <!-- Header Tool -->
+                <div class="text-center mb-8 fade-in text-slate-100">
+                    <div class="inline-block p-4 rounded-full bg-lunar-card border border-gray-700 mb-4 shadow-lg">
+                        <i class="fa-solid fa-moon text-4xl text-lunar-gold"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-white mb-2">Máy Tính Năm Nhuận Âm Lịch</h1>
+                    <p class="text-gray-400">Nhập một năm bất kỳ để xem công thức tính và kết quả</p>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 md:p-8 mb-6 fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex flex-col md:flex-row gap-4 items-center">
+                        <div class="relative w-full">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                                <i class="fa-solid fa-calendar-days text-gray-400"></i>
+                            </div>
+                            <input type="number" id="yearInput" 
+                                class="no-spin w-full bg-slate-800 border border-slate-600 text-white text-lg rounded-xl focus:ring-lunar-gold focus:border-lunar-gold block pl-12 p-4 transition-colors placeholder-gray-500" 
+                                placeholder="Ví dụ: 2028, 2026...">
+                        </div>
+                        <button onclick="calculateLeapYear()" 
+                            class="w-full md:w-auto px-8 py-4 bg-lunar-gold hover:bg-yellow-500 text-slate-900 font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:shadow-[0_0_25px_rgba(251,191,36,0.5)] whitespace-nowrap">
+                            <i class="fa-solid fa-calculator mr-2"></i> Tính Toán
+                        </button>
+                    </div>
+                </div>
+
+                <div id="resultContainer" class="hidden glass-card rounded-2xl p-6 md:p-8 fade-in text-center">
+                    <!-- Trạng thái kết quả -->
+                    <div id="statusBadge" class="inline-block px-4 py-1 rounded-full text-sm font-semibold mb-4"></div>
+                    
+                    <h2 id="mainResult" class="text-3xl md:text-4xl font-bold text-white mb-2"></h2>
+                    <p id="subResult" class="text-xl text-lunar-gold font-semibold mb-6"></p>
+
+                    <hr class="border-slate-700 mb-6">
+
+                    <!-- Giải thích công thức -->
+                    <div class="text-left bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                        <h3 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-square-root-variable text-blue-400 mr-2"></i>Chi tiết công thức tính toán:</h3>
+                        <ul class="space-y-3 text-gray-300 font-mono text-sm md:text-base">
+                            <li id="step1" class="flex gap-2"></li>
+                            <li id="step2" class="flex gap-2"></li>
+                            <li id="step3" class="flex gap-2"></li>
+                            <li id="step4" class="flex gap-2 hidden"><span class="text-lunar-gold whitespace-nowrap">Thiên văn:</span> <span id="astroCalc" class="text-gray-300"></span></li>
+                            <li id="conclusion" class="font-bold text-white mt-4 border-l-4 border-lunar-gold pl-3 py-1"></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-8 text-gray-500 text-sm fade-in" style="animation-delay: 0.3s;">
+                    <p>Dữ liệu được tính toán động 100% bằng thuật toán thiên văn học (Quỹ đạo Mặt Trời, Mặt Trăng, Điểm Sóc và Trung Khí).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- KẾT THÚC MODAL -->
 
     <script>
         /**
@@ -820,6 +927,25 @@
                     lunarError.classList.remove('hidden');
                 }
             });
+
+            // Logic Mở/Đóng Modal Máy tính Năm Nhuận
+            document.getElementById('btn-open-leap-calc').addEventListener('click', () => {
+                document.getElementById('leap-modal').classList.remove('hidden');
+                // Tự động lấy năm đang xem để đưa vào ô nhập liệu
+                document.getElementById('yearInput').value = state.viewYear; 
+                calculateLeapYear(); // Tính luôn cho nóng
+            });
+
+            document.getElementById('btn-close-leap-calc').addEventListener('click', () => {
+                document.getElementById('leap-modal').classList.add('hidden');
+            });
+            
+            // Lắng nghe phím Enter trong ô input Tool
+            document.getElementById('yearInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    calculateLeapYear();
+                }
+            });
         }
 
         function updateSelects() {
@@ -844,6 +970,161 @@
         }
 
         document.addEventListener('DOMContentLoaded', initApp);
+
+        // =========================================================================
+        // HÀM TÍNH TOÁN DÀNH RIÊNG CHO MODAL MÁY TÍNH NĂM NHUẬN
+        // (Để tránh xung đột với thuật toán lịch rút gọn phía trên)
+        // =========================================================================
+        
+        function leap_sunLongitude(jdn) {
+            let T = (jdn - 2451545.0) / 36525.0;
+            let L0 = 280.46646 + T * (36000.76983 + T * 0.0003032);
+            let M = 357.52911 + T * (35999.05029 - T * 0.0001537);
+            let C = (1.914602 - T * (0.004817 + 0.000014 * T)) * Math.sin(M * PI / 180) 
+                  + (0.019993 - 0.000101 * T) * Math.sin(2 * M * PI / 180) 
+                  + 0.000289 * Math.sin(3 * M * PI / 180);
+            let L = L0 + C;
+            return L - 360 * INT(L / 360);
+        }
+
+        function leap_getSolarTerm(jdn) {
+            let sl = leap_sunLongitude(jdn);
+            return INT(sl / 30.0);
+        }
+
+        function leap_getNewMoonDay(k, timeZone) {
+            let T = k / 1236.85;
+            let T2 = T * T;
+            let T3 = T2 * T;
+            let dr = PI / 180;
+            let Jd = 2415020.75933 + 29.53058868 * k + 0.0001178 * T2 - 0.000000155 * T3
+                + 0.00033 * Math.sin((166.56 + 132.87 * T - 0.009173 * T2) * dr);
+            
+            let M = 359.2242 + 29.10535608 * k - 0.0000333 * T2 - 0.00000347 * T3;
+            let Mprime = 306.0253 + 385.81691806 * k + 0.0107306 * T2 + 0.00001236 * T3;
+            let F = 21.2964 + 390.67050646 * k - 0.0016528 * T2 - 0.00000239 * T3;
+            
+            let C1 = (0.1734 - 0.000393 * T) * Math.sin(M * dr) + 0.0021 * Math.sin(2 * M * dr);
+            let C2 = -0.4068 * Math.sin(Mprime * dr) + 0.0161 * Math.sin(2 * Mprime * dr);
+            let C3 = -0.0004 * Math.sin(3 * Mprime * dr);
+            let C4 = 0.0104 * Math.sin(2 * F * dr) - 0.0051 * Math.sin((M + Mprime) * dr);
+            let C5 = -0.0074 * Math.sin((M - Mprime) * dr) + 0.0004 * Math.sin((2 * F + M) * dr);
+            let C6 = -0.0004 * Math.sin((2 * F - M) * dr) - 0.0006 * Math.sin((2 * F + Mprime) * dr);
+            let C7 = 0.001 * Math.sin((2 * F - Mprime) * dr) + 0.0005 * Math.sin((M + 2 * Mprime) * dr);
+
+            Jd = Jd + C1 + C2 + C3 + C4 + C5 + C6 + C7;
+            return INT(Jd + 0.5 + timeZone / 24); 
+        }
+
+        function leap_getLunarMonth11(yy, timeZone) {
+            let off = jdFromDate(31, 12, yy) - 2415021;
+            let k = INT(off / 29.530588853);
+            let nm = leap_getNewMoonDay(k, timeZone);
+            let sunLong = leap_sunLongitude(nm - 0.5 - timeZone / 24);
+            if (sunLong >= 270) {
+                nm = leap_getNewMoonDay(k - 1, timeZone);
+            }
+            return nm;
+        }
+
+        function leap_getLeapMonthOffset(a11, timeZone) {
+            let k = INT((a11 - 2415021) / 29.530588853 + 0.5);
+            let i = 1;
+            let arc = leap_getSolarTerm(leap_getNewMoonDay(k + i, timeZone));
+            let hasLeapMonth = false;
+            let leapMonth = 0;
+
+            while (i < 14) {
+                let newMoon = leap_getNewMoonDay(k + i, timeZone);
+                let nextMoon = leap_getNewMoonDay(k + i + 1, timeZone);
+                let hasTrungKhi = false;
+                
+                for (let day = newMoon; day < nextMoon; day++) {
+                    let st = leap_getSolarTerm(day);
+                    if (st !== arc) {
+                        hasTrungKhi = true;
+                        arc = st;
+                        break;
+                    }
+                }
+                
+                if (!hasTrungKhi && !hasLeapMonth) {
+                    leapMonth = i;
+                    hasLeapMonth = true;
+                }
+                i++;
+            }
+            return leapMonth;
+        }
+
+        function calculateAstronomicalLeapMonth(year) {
+            let timeZone = 7.0; 
+            let a11_prev = leap_getLunarMonth11(year - 1, timeZone);
+            let a11_curr = leap_getLunarMonth11(year, timeZone);
+            
+            let daysBetween = a11_curr - a11_prev;
+            
+            if (daysBetween > 365) {
+                let leapOffset = leap_getLeapMonthOffset(a11_prev, timeZone);
+                let leapMonth = leapOffset - 2;
+                if (leapMonth <= 0) leapMonth += 12;
+                return leapMonth;
+            }
+            return 0; 
+        }
+
+        function calculateLeapYear() {
+            const yearInput = document.getElementById('yearInput');
+            if(!yearInput) return;
+            
+            const year = parseInt(yearInput.value);
+
+            if (isNaN(year) || year < 1) {
+                yearInput.classList.add('border-red-500');
+                setTimeout(() => yearInput.classList.remove('border-red-500'), 1000);
+                return;
+            }
+
+            const remainder = year % 19;
+            const quotient = Math.floor(year / 19);
+            const astroLeapMonth = calculateAstronomicalLeapMonth(year);
+            const isLeapYearAstro = astroLeapMonth > 0;
+            
+            const container = document.getElementById('resultContainer');
+            const statusBadge = document.getElementById('statusBadge');
+            const mainResult = document.getElementById('mainResult');
+            const subResult = document.getElementById('subResult');
+            const step4 = document.getElementById('step4');
+            const astroCalc = document.getElementById('astroCalc');
+            
+            document.getElementById('step1').innerHTML = `<span class="text-lunar-gold whitespace-nowrap">Dân gian (B1):</span> Lấy ${year} : 19 = ${quotient} (dư ${remainder})`;
+            document.getElementById('step2').innerHTML = `<span class="text-lunar-gold whitespace-nowrap">Dân gian (B2):</span> Số dư tìm được là <b>${remainder}</b>.`;
+            document.getElementById('step3').innerHTML = `<span class="text-lunar-gold whitespace-nowrap">Dân gian (B3):</span> So sánh ${remainder} với tập hợp nhuận <b>[0, 3, 6, 9, 11, 14, 17]</b>.`;
+            step4.classList.remove('hidden');
+
+            if (isLeapYearAstro) {
+                statusBadge.textContent = "CÓ NHUẬN ÂM LỊCH";
+                statusBadge.className = "inline-block px-4 py-1 rounded-full text-sm font-bold mb-4 bg-green-500/20 text-green-400 border border-green-500/30";
+                mainResult.textContent = `Năm ${year} là năm nhuận!`;
+                subResult.innerHTML = `<i class="fa-regular fa-calendar-check mr-2"></i>Nhuận vào Tháng ${astroLeapMonth} Âm Lịch`;
+                
+                astroCalc.innerHTML = `Tính theo <b>Sóc & Trung Khí</b>: Giữa 2 kỳ Đông chí (tháng 11 năm trước và năm nay) có 13 tháng. Tháng ${astroLeapMonth} Âm lịch hoàn toàn <b class="text-red-400">không có Trung Khí</b> nào, nên nó bị giữ lại làm tháng nhuận.`;
+                document.getElementById('conclusion').innerHTML = `Kết luận chung: Năm ${year} nhuận tháng ${astroLeapMonth}.`;
+            } else {
+                statusBadge.textContent = "KHÔNG NHUẬN ÂM LỊCH";
+                statusBadge.className = "inline-block px-4 py-1 rounded-full text-sm font-bold mb-4 bg-red-500/20 text-red-400 border border-red-500/30";
+                mainResult.textContent = `Năm ${year} là năm thường`;
+                subResult.textContent = "Không có tháng nhuận trong năm này.";
+                
+                astroCalc.innerHTML = `Tính theo <b>Sóc & Trung Khí</b>: Giữa 2 kỳ Đông chí chỉ có 12 tháng Âm lịch bình thường, mỗi tháng đều chứa đầy đủ 1 Trung Khí.`;
+                document.getElementById('conclusion').innerHTML = `Kết luận chung: Năm ${year} không phải năm nhuận.`;
+            }
+
+            container.classList.remove('hidden');
+            container.classList.remove('fade-in');
+            void container.offsetWidth; 
+            container.classList.add('fade-in');
+        }
 
     </script>
 </body>
