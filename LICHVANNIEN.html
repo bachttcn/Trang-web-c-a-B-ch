@@ -8,6 +8,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Import Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Thêm thư viện Flatpickr để ô chọn ngày xịn hơn, hỗ trợ gõ tay -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/vn.js"></script>
+
     <!-- Google Fonts: Roboto for main text, Playfair Display for accents -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
@@ -143,9 +149,9 @@
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-search text-gray-400"></i>
                     </div>
-                    <!-- Ô Input Type Date để chọn ngày nhanh -->
-                    <input type="date" id="search-date" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-700 bg-white shadow-sm transition-all hover:border-gray-400 cursor-pointer" title="Chọn ngày cần tra cứu">
-                    <span class="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 pointer-events-none hidden sm:block">Tra cứu</span>
+                    <!-- Đổi type="date" thành type="text" để dùng thư viện Flatpickr -->
+                    <input type="text" id="search-date" placeholder="dd/mm/yyyy" class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 outline-none text-gray-700 bg-white shadow-sm transition-all hover:border-gray-400 cursor-text" title="Nhập hoặc chọn ngày cần tra cứu (VD: 15/08/2026)">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-xs text-gray-400 pointer-events-none hidden sm:block"><i class="far fa-calendar-alt"></i></span>
                 </div>
             </div>
 
@@ -676,18 +682,22 @@
                 renderCalendar();
             });
 
-            // Sự kiện khi người dùng chọn ngày từ Ô Tìm Kiếm (Date Picker)
-            document.getElementById('search-date').addEventListener('change', (e) => {
-                const selectedDateVal = e.target.value;
-                if (selectedDateVal) {
-                    const [y, m, d] = selectedDateVal.split('-');
-                    const targetYear = parseInt(y);
-                    const targetMonth = parseInt(m);
-                    const targetDay = parseInt(d);
+            // Tích hợp Flatpickr thay vì dùng sự kiện change gốc của thẻ input date
+            flatpickr("#search-date", {
+                dateFormat: "d/m/Y",
+                allowInput: true, // Cho phép người dùng gõ tay thoải mái
+                locale: "vn", // Dịch ra tiếng Việt
+                onChange: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length > 0) {
+                        const targetDate = selectedDates[0];
+                        const targetYear = targetDate.getFullYear();
+                        const targetMonth = targetDate.getMonth() + 1;
+                        const targetDay = targetDate.getDate();
 
-                    // Chuyển view và chọn ngày
-                    state.setMonthYear(targetMonth, targetYear);
-                    state.selectDate(targetDay, targetMonth, targetYear);
+                        // Chuyển view và chọn ngày
+                        state.setMonthYear(targetMonth, targetYear);
+                        state.selectDate(targetDay, targetMonth, targetYear);
+                    }
                 }
             });
 
@@ -721,10 +731,15 @@
             // Cập nhật giá trị cho ô Search Date tương ứng với ngày đang chọn
             const searchInput = document.getElementById('search-date');
             if (searchInput) {
-                const y = state.selectedDate.getFullYear();
-                const m = String(state.selectedDate.getMonth() + 1).padStart(2, '0');
-                const d = String(state.selectedDate.getDate()).padStart(2, '0');
-                searchInput.value = `${y}-${m}-${d}`;
+                if (searchInput._flatpickr) {
+                    // Set lại ngày trên Flatpickr
+                    searchInput._flatpickr.setDate(state.selectedDate, false);
+                } else {
+                    const y = state.selectedDate.getFullYear();
+                    const m = String(state.selectedDate.getMonth() + 1).padStart(2, '0');
+                    const d = String(state.selectedDate.getDate()).padStart(2, '0');
+                    searchInput.value = `${d}/${m}/${y}`;
+                }
             }
         }
 
