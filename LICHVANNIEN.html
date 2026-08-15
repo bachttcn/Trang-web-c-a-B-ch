@@ -583,7 +583,7 @@
                 document.getElementById('detail-lunar-day-can-chi').textContent = ``;
             } else {
                 document.getElementById('detail-lunar-date').textContent = `${String(lunar.day).padStart(2, '0')}/${String(lunar.month).padStart(2, '0')}`;
-                document.getElementById('detail-lunar-can-chi').textContent = `Năm ${getYearCanChi(lunar.year)}`;
+                document.getElementById('detail-lunar-can-chi').textContent = `Năm ${getYearCanChi(lunar.year)} - ${lunar.year}`;
                 document.getElementById('detail-lunar-month-can-chi').textContent = `Tháng ${getMonthCanChi(lunar.year, lunar.month)}`;
                 document.getElementById('detail-lunar-day-can-chi').textContent = `Ngày ${getDayCanChi(sDay, sMonth, sYear)}`;
             }
