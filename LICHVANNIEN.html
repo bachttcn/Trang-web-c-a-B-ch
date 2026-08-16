@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lịch Vạn Niên Việt Nam</title>
+    <title>Lịch Vạn Niên Việt Nam · Trịnh Toàn Bách</title>
     <!-- Import Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -97,6 +97,37 @@
 
         .weekend {
             color: #ef4444; /* text-red-500 */
+        }
+
+        /* Tiêu đề bản quyền / tác giả hiển thị bên phải lịch */
+        .copyright-banner {
+            margin-top: 1.25rem;
+            padding: 0.9rem 1rem;
+            border: 1px solid rgba(211, 47, 47, 0.18);
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0.85rem;
+            background: linear-gradient(135deg, #fff8f0 0%, #fff 55%, #fff7e6 100%);
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+        }
+        .copyright-banner .copyright-title {
+            color: #c62828;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            line-height: 1.35;
+        }
+        .copyright-banner .copyright-author {
+            margin-top: 0.28rem;
+            color: #8b5a00;
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+        }
+        .copyright-banner .copyright-note {
+            margin-top: 0.18rem;
+            color: #6b7280;
+            font-size: 0.75rem;
         }
 
         /* Styles cho tool năm nhuận */
@@ -241,8 +272,15 @@
                 </div>
             </div>
             
+            <!-- Tiêu đề bản quyền / tác giả -->
+            <div class="copyright-banner" aria-label="Thông tin bản quyền">
+                <div class="copyright-title">LỊCH VẠN NIÊN VIỆT NAM</div>
+                <div class="copyright-author">© 2026 · PHÁT TRIỂN BỞI TRỊNH TOÀN BÁCH</div>
+                <div class="copyright-note">Bản quyền giao diện &amp; mã nguồn · Không sao chép khi chưa được phép</div>
+            </div>
+
             <!-- Ghi chú/Sự kiện dưới lịch -->
-            <div class="mt-8 border-t pt-4">
+            <div class="mt-6 border-t pt-4">
                 <h3 class="text-sm font-bold text-gray-700 uppercase mb-2 flex items-center gap-2">
                     <i class="fas fa-calendar-star text-yellow-500"></i> Sự kiện trong tháng
                 </h3>
