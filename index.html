@@ -274,6 +274,29 @@
             transform: translateX(100%);
         }
 
+        /* Nút mở công cụ tách - gộp PDF */
+        .btn-pdf {
+            background: linear-gradient(135deg, #2563eb, #0f4cbd);
+            border-radius: 18px;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.26);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+        }
+
+        .btn-pdf::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.55s ease;
+        }
+
+        .btn-pdf:hover::after {
+            transform: translateX(100%);
+        }
+
         .footer-info {
             margin-top: 30px;
             font-size: 12px;
@@ -413,6 +436,10 @@
                 📅 LỊCH VẠN NIÊN VIỆT NAM
             </a>
             <!-- KẾT THÚC NÚT LỊCH VẠN NIÊN -->
+
+            <a href="tach_gop_pdf.html" class="btn btn-pdf" target="_blank" rel="noopener">
+                📄 TÁCH – GỘP PDF ONLINE
+            </a>
 
             <a href="http://ttgdtxcaungang.sgdtravinh.edu.vn/" class="btn btn-website" target="_blank" rel="noopener">
                 Website Cơ Quan
