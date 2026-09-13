@@ -53,7 +53,7 @@
       <div class="alias">
         <input id="aliasInput" type="text" placeholder="Tên tùy chỉnh nếu muốn, ví dụ: toanbach hoặc tailieu2026 (có thể bỏ trống)" autocomplete="off" />
       </div>
-      <p class="tip">Link tạo ra sẽ có dạng <b id="demoHost">/go/abcde</b>. Muốn dùng tên đẹp thì điền ô tùy chỉnh, ví dụ <b>/go/toanbach</b>.</p>
+      <p class="tip">Khi kho link riêng hoạt động, link có dạng <b id="demoHost">/go/abcde</b>. Nếu kho tạm mất kết nối, ứng dụng sẽ tự dùng link <b>da.gd</b> để anh không bị gián đoạn.</p>
       <div id="status" class="status"></div>
 
       <section id="result" class="result">
@@ -110,25 +110,72 @@
       shortenBtn.disabled = true;
       shortenBtn.textContent = 'Đang tạo...';
       try {
-        const res = await fetch('/api/shorten', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url, alias })
-        });
-        const data = await res.json();
-        if (!data.ok) throw new Error(data.error || 'Không tạo được link.');
+        let res;
+        let data;
+        let usedFallback = false;
+
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 6000);
+          try {
+            res = await fetch('/api/shorten', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ url, alias }),
+              signal: controller.signal
+            });
+            data = await readJson(res);
+          } finally {
+            clearTimeout(timeoutId);
+          }
+        } catch (primaryError) {
+          if (!(primaryError instanceof TypeError) && primaryError?.name !== 'AbortError') throw primaryError;
+          ({ res, data } = await createFallbackLink(url, alias));
+          usedFallback = true;
+        }
+
+        const oldApiFetchError = String(data?.error || '').toLowerCase().includes('fetch failed');
+        if (!usedFallback && (res.status === 503 || data?.storageUnavailable || oldApiFetchError)) {
+          ({ res, data } = await createFallbackLink(url, alias));
+          usedFallback = true;
+        }
+
+        if (!res.ok || !data.ok) throw new Error(data.error || 'Không tạo được link.');
 
         currentShortUrl = data.shortUrl;
         shortLink.textContent = data.shortUrl.replace(/^https?:\/\//, '');
         shortLink.href = data.shortUrl;
         qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=260x260&margin=12&data=' + encodeURIComponent(data.shortUrl);
         result.classList.add('show');
-        showStatus('Tạo link thành công. Bấm Sao chép để gửi cho người khác nhé.', 'ok');
+        showStatus(usedFallback
+          ? 'Đã tạo link dự phòng da.gd thành công. Kho link riêng đang mất kết nối nhưng ứng dụng vẫn dùng bình thường.'
+          : 'Tạo link riêng thành công. Bấm Sao chép để gửi cho người khác nhé.', 'ok');
       } catch (err) {
-        showStatus(err.message || 'Có lỗi xảy ra.', 'err');
+        const message = err instanceof TypeError
+          ? 'Không kết nối được máy chủ. Anh kiểm tra mạng rồi thử lại.'
+          : (err.message || 'Có lỗi xảy ra.');
+        showStatus(message, 'err');
       } finally {
         shortenBtn.disabled = false;
         shortenBtn.textContent = 'Rút gọn';
+      }
+    }
+
+    async function createFallbackLink(url, alias) {
+      const res = await fetch('/api/dagd', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url, custom: alias })
+      });
+      return { res, data: await readJson(res) };
+    }
+
+    async function readJson(response) {
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (_) {
+        throw new Error('Máy chủ trả về dữ liệu không hợp lệ. Vui lòng thử lại sau.');
       }
     }
 
